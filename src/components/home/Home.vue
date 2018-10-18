@@ -106,7 +106,7 @@
 <script>
 import Vue from 'vue'
 import Service from '../../service/serviceReal.js'
-// import Popup from '../popup/Popup'
+import Popup from '../popup/Popup'
 import PopupAuth from '../popup/PopupAuth'
 import EventBus from '../../event-bus.js'
 
@@ -114,6 +114,7 @@ export default {
   name: 'home',
 
   components: {
+    'popup': Popup,
     'popupauth': PopupAuth
   },
 
