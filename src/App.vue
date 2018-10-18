@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import Service from './service/Service'
+import Service from './service/serviceReal.js'
 // import EventBus from './event-bus.js'
 
 export default {

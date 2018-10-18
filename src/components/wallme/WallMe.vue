@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Service from '../../service/Service'
+import Service from '../../service/serviceReal.js'
 
 export default {
   name: 'wallme',
