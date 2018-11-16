@@ -1,11 +1,14 @@
 import Vue from 'vue'
 import EventBus from '../event-bus.js'
+import countries from './countries.json'
 
 let singleInstance
 
 class Service {
   constructor () {
     singleInstance = this
+    this.countries = countries
+    this.sessionId = null
   }
 
   static get instance () {
@@ -15,9 +18,48 @@ class Service {
     return singleInstance
   }
 
+  storeSessionId (token) {
+    this.sessionId = token
+    if (this.sessionId) {
+      window.localStorage.setItem('fanzik-token', this.sessionId)
+    }
+    this.setAuthorizationHeader(this.sessionId)
+  }
+
+  removeSessionId (token) {
+    if (token) {
+      this.sessionId = null
+      window.localStorage.removeItem('fanzik-token')
+    }
+    this.setAuthorizationHeader(token)
+  }
+
+  getAuthorizationHeader () {
+    return Vue.http.headers.common['Authorization']
+  }
+
   getToken () {
-    // console.log(localStorage.getItem('token'))
-    return localStorage.getItem('token')
+    if (this.sessionId == null) {
+      this.sessionId = window.localStorage.getItem('fanzik-token')
+      console.log('from getToken ' + this.sessionId)
+
+      this.setAuthorizationHeader(this.sessionId)
+    }
+    return this.sessionId
+  }
+
+  setAuthorizationHeader (token) {
+    if (token) {
+      Vue.http.headers.common['Authorization'] = `Bearer ${token}`
+      console.log('set authorization Hearder wtih Bearer  ' + Vue.http.headers.common['Authorization'])
+    } else {
+      console.log('delete session')
+      delete Vue.http.headers.common['Authorization']
+    }
+  }
+
+  getCountriesList () {
+    return this.countries
   }
 
   register (userData) {
@@ -25,7 +67,8 @@ class Service {
     let params = {
       pseudo: userData.pseudo,
       email: userData.email,
-      password: userData.password
+      password: userData.password,
+      country: userData.country
     }
 
     console.log(JSON.stringify(params) + 'from service')
@@ -57,8 +100,8 @@ class Service {
   }
 
   logout () {
-    localStorage.removeItem('token')
-    EventBus.$emit('isAuthenticate')
+    this.removeSessionId(this.sessionId)
+    EventBus.$emit('isLogout')
   }
 
   fetchMe () {
@@ -66,7 +109,6 @@ class Service {
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         let user = response.data
-        console.log(response.data)
         resolve(user)
       })
     })
@@ -80,6 +122,87 @@ class Service {
         let users = JSON.stringify(response.data)
         console.log(users)
         resolve(users)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  fetchMusics (search) {
+    const url = `http://localhost:3000/api/home/${search}`
+    console.log(search)
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        let events = response.data.data.search.events.event
+        // let events = response.data.data.search.events.event.filter((event) => {
+        //   return event.country_name === 'France'
+        // })
+        resolve(events)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  fetchArtists (q) {
+    console.log(q)
+    const url = `http://localhost:3000/api/search/artists/${q}`
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        resolve(response)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  spotifyAuthentication () {
+    Vue.http.options.xhr = {withCredentials: true}
+    const url = 'http://localhost:3000/api/spotify/login'
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        resolve(response.data)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  receiveSpotifyCredentials (code, state) {
+    const url = `http://localhost:3000/api/callback?code=${code}&state=${state}`
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        console.log(response.data)
+        resolve(response.data)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  refreshSpotifyToken () {
+    console.log('entering refresh token')
+    const url = 'http://localhost:3000/api/refresh_token'
+    return new Promise ((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        resolve(response.data)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  fetchUserPlaylist (token) {
+    const url = `http://localhost:3000/api/user/spotify/playlist/${token}`
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        resolve(response.data)
       },
       (error) => {
         console.log(error)

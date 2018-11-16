@@ -1,0 +1,40 @@
+.blocglobal {
+
+  width: 100%;
+  min-height: 400px;
+  background: whitesmoke;
+  border-radius: 20px;
+
+  .blocinter {
+    display: flex;
+    padding : 10px;
+    min-height: 400px;
+
+    .globalEvents {
+      width: 80%;
+      height: inherit;
+      background: whitesmoke;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+      border-right: 3px solid lightgrey;
+    }
+
+    .information {
+      width: 20%;
+      height: inherit;
+      background: whitesmoke;
+      border-radius: 20px;
+
+      .circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 10px solid red;
+        color: red;
+        line-height: 150px;
+        text-align: center;
+        margin: 20px auto;
+      }
+    }
+  }
+}

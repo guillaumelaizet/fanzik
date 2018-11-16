@@ -3,17 +3,31 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const mongodb = require('mongodb')
 const path = require('path')
+var request = require('request'); // "Request" library
+var cors = require('cors');
+var querystring = require('querystring');
+// var cookieParser = require('cookie-parser');
 
 const Bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const nodemailer = require('nodemailer')
 
+const eventful = require('eventful-node')
+console.log(new eventful.Client('KNTLkbbm3QH6vhQf'))
+
+const client = new eventful.Client('KNTLkbbm3QH6vhQf')
+
 const User = require('../models/user')
 const Event = require('../models/event')
 
-// const url = 'mongodb://localhost:27017/musicProject'
-const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
+const url = 'mongodb://localhost:27017/musicProject'
+// const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
+
+const EventFul = 'http://api.eventful.com/js/api'
+
+router.use(cors())
+
 
 
 mongoose.connect(url, { useNewUrlParser: true }, (err) => {
@@ -26,20 +40,22 @@ mongoose.connect(url, { useNewUrlParser: true }, (err) => {
   }
 });
 
-
 function verifyToken(req, res, next) {
-  console.log(req.header('authorization'))
+  // console.log('Bearer from verifyToken ' + req.headers.authorization)
   if (!req.headers.authorization) {
+    console.log('no bearer')
     return res.status(401).send('Unauthorized request')
   }
   let token = req.headers.authorization.split(' ')[1]
   // console.log(token)
   if (token === 'null') {
+    console.log('no token')
     return res.status(401).send('Unauthorized request')
   }
   let payload = jwt.verify(token, 'secretKey')
   // console.log('enter verifyToken function');
   if (!payload) {
+    console.log('payload not accepted')
     return res.status(401).send('Unauthorized request')
   }
   req.userId = payload.subject
@@ -47,28 +63,41 @@ function verifyToken(req, res, next) {
 }
 
 // when a user leave the application without loggout, and come back, the user is redirect to his profile directly i token exists
-router.get('/home', (req, res) => {
+// router.get('/home', (req, res) => {
   // console.log(req.headers.authorization)
-  let token = req.headers.authorization.split(' ')[1]
+  // let token = req.headers.authorization.split(' ')[1]
   // console.log('token  ' + token)
-  if (token == 'null') {
-    res.status(401).send('Unauthorized')
-  } else {
-    let payload = jwt.verify(token, 'secretKey')
-    if (!payload) {
-      res.status(401).send('Unauthorized')
+//   if (token == 'null') {
+//     res.status(401).send('Unauthorized')
+//   } else {
+//     let payload = jwt.verify(token, 'secretKey')
+//     if (!payload) {
+//       res.status(401).send('Unauthorized')
+//     }
+//     User.findOne({_id: payload.subject}, (err, data) => {
+//       if (err) {
+//         console.log('error')
+//         res.send(err)
+//       } else {
+//         console.log('ok from api')
+//         res.send(data)
+//       }
+//     })
+//   }
+// })
+
+router.get('/home/:q', (req, res) => {
+  let q = req.params.q
+  console.log(q)
+  client.searchEvents({keywords: q, within: 'title', page_size: 20, category: 'music'}, (err, data) => {
+    if (err) {
+      return console.error(err)
     }
-    User.findOne({_id: payload.subject}, (err, data) => {
-      if (err) {
-        console.log('error')
-        res.send(err)
-      } else {
-        console.log('ok from api')
-        res.send(data)
-      }
-    })
-  }
+    console.log(data)
+    res.status(200).send({data})
+  })
 })
+
 
 // -------------------------------------------------------------------- Auths ----------------------------------------------------------
 
@@ -96,13 +125,8 @@ router.get('/verifyifduplicate/:data1/:data2', (req, res) => {
 })
 
 
-router.post('/register', (req, res) => {
+router.post('/register', (req, res, next) => {
   let userData = req.body
-  console.log(req.body)
-  console.log(req.params)
-  // console.log(req)
-  // console.log(req.file + '  ' + req.files)
-
   User.findOne({email: userData.email}, (err, user) => {
     if (err) {
       console.log(err);
@@ -187,8 +211,9 @@ router.post('/register', (req, res) => {
 })
 
 
-router.post('/login', (req, res) => {
+router.post('/login', (req, res, next) => {
   let userData = req.body
+  console.log(req.cookies)
 
   User.findOne({pseudo: userData.pseudo}, (err, user) => {
     if (err) {
@@ -328,8 +353,8 @@ router.put('/user/:id', (req, res) => {
 
 router.get('/user/me', verifyToken, (req, res) => {
   let token = req.headers.authorization.split(' ')[1]
-  console.log(token)
   let payload = jwt.verify(token, 'secretKey')
+  // console.log('userMe')
   User.findOne({_id: payload.subject}, (err, user) => {
     if (err) {
       console.log(err)
@@ -721,6 +746,240 @@ router.get('/discussions', verifyToken, (req, res) => {
 })
 
 
+// ---------------------------------------------------- spotifyOauth -------------------------------------------------------------
 
+
+var client_id = '9f854027e27f459bbe6fa01599ff86f7'; // Your client id
+var client_secret = '9d14626ea88d4f46a8d858fd4a957efe'; // Your secret
+var redirect_uri = 'http://localhost:8080/home'; // Your redirect uri
+var ACCESS_TOKEN = ''
+var REFRESH_TOKEN = ''
+
+router.use(cors())
+/**
+ * Generates a random string containing numbers and letters
+ * @param  {number} length The length of the string
+ * @return {string} The generated string
+ */
+var generateRandomString = function(length) {
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (var i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
+
+var stateKey = 'spotify_auth_state';
+var state = generateRandomString(16);
+
+router.use((req, res, next) => {
+  let cookie = req.cookies['spotify_auth_state']
+
+  if (!cookie) {
+    res.cookie(stateKey, state)
+    req.cookies['spotify_auth_state'] = state
+  }
+  next();
+});
+
+
+router.get('/spotify/login',  function(req, res) {
+  console.log('enter setting cookie')
+  console.log(req.cookies)
+  // res.header['set-cookie'] = state
+  // console.log('cookie ' + res.header['set-cookie'])
+  // res.cookie(stateKey, state, { expires  : new Date(Date.now() + 9999999), domain: 'http://localhost:8080', httpOnly: false });
+  // console.log(res.cookie(stateKey))
+
+  // your application requests authorization
+  var scope = 'user-read-private user-read-email';
+  let url = 'https://accounts.spotify.com/authorize?' +
+    querystring.stringify({
+      response_type: 'code',
+      client_id: client_id,
+      scope: scope,
+      redirect_uri: redirect_uri,
+      state: state
+    })
+  // res.redirect('https://accounts.spotify.com/authorize?' +
+  //   querystring.stringify({
+  //     response_type: 'code',
+  //     client_id: client_id,
+  //     scope: scope,
+  //     redirect_uri: redirect_uri,
+  //     state: state
+  //   }));
+    res.send({url: url, cookie: state})
+});
+
+router.get('/callback', function(req, res) {
+  // your application requests refresh and access tokens
+  // after checking the state parameter
+  console.log('entering callback')
+  console.log(req.cookies)
+  var code = req.query.code || null;
+  var state = req.query.state || null;
+  var storedState = req.cookies ? req.cookies[stateKey] : null;
+  // console.log(code + ' ' + state + ' ' + storedState)
+  if (state === null || state !== storedState) {
+    res.redirect('/#' +
+      querystring.stringify({
+        error: 'state_mismatch'
+      }));
+  } else {
+    console.log('clear cookie')
+    res.clearCookie(stateKey);
+    var authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      form: {
+        code: code,
+        redirect_uri: redirect_uri,
+        grant_type: 'authorization_code'
+      },
+      headers: {
+        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+      },
+      json: true
+    };
+
+    request.post(authOptions, function(error, response, body) {
+      let data = {}
+      if (!error && response.statusCode === 200) {
+        console.log(body.access_token)
+        ACCESS_TOKEN = body.access_token,
+        REFRESH_TOKEN = body.refresh_token;
+
+        console.log('Access_TOken ' + ACCESS_TOKEN)
+
+        var options = {
+          url: 'https://api.spotify.com/v1/me',
+          headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+          json: true
+        };
+
+        // use the access token to access the Spotify Web API
+        request.get(options, function(error, response, body) {
+          // console.log('receiving data')
+          // console.log(body);
+          data = body
+          let url = 'http://localhost:8080/home'
+          // let url = 'http://localhost:8080/home?' +
+          //   querystring.stringify({
+          //     access_token: access_token,
+          //     refresh_token: refresh_token
+          //   })
+          res.send({url:url, access_token: ACCESS_TOKEN, refresh_token: REFRESH_TOKEN, data: data})
+        });
+
+        // we can also pass the token to the browser to make requests from there
+        // res.redirect('/#' +
+        //   querystring.stringify({
+        //     access_token: access_token,
+        //     refresh_token: refresh_token
+        //   }));
+
+      } else {
+        res.redirect('/#' +
+          querystring.stringify({
+            error: 'invalid_token'
+          }));
+      }
+    });
+  }
+});
+
+
+router.get('/user/spotify/playlist/:access_token', (req, res) => {
+  let access_token = ACCESS_TOKEN
+  console.log(access_token)
+  let playlists = {}
+
+  let options = {
+    url: 'https://api.spotify.com/v1/me/playlists?limit=50',
+    headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+    json: true
+  }
+
+  request.get(options, (error, response, body) => {
+    playlists = body.items
+    // console.log(playlists)
+    // for (let playlist in playlists) {
+    //   console.log(playlist)
+    // }
+    let playlist = playlists.filter((playlist) => {
+      // console.log(playlist.name)
+      return playlist.name == 'Inox festival'
+    })
+
+    playlist = Object.assign({}, playlist)
+    console.log('playlist' + playlist)
+    options = {
+      url: `https://api.spotify.com/v1/playlists/${playlist[0].id}/tracks`,
+      headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+      json: true
+    }
+
+    request.get(options, (error, response, body) => {
+      // console.log(body);
+      let tracks = body.items
+
+      console.log(body.items[0].track.album.artists[0].name)
+      body.items.map((item) => {
+        // console.log(item.track.album.artists[0].name)
+      })
+    })
+
+  })
+})
+
+router.get('/search/artists/:q', (req, res) => {
+  let q = req.params.q
+  console.log('access_token' + ACCESS_TOKEN)
+
+  let options = {
+    url: `https://api.spotify.com/v1/search?q=${q}&type=artist` ,
+    headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+    q: q,
+    type: 'artist',
+    json: true
+  }
+
+  request.get(options, q, (error, response, body) => {
+    console.log(body)
+    res.send(body)
+  })
+})
+
+router.get('/refresh_token', function(req, res) {
+
+
+  // requesting access token from refresh token
+  var refresh_token = REFRESH_TOKEN;
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    },
+    json: true
+  };
+
+  request.post(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      ACCESS_TOKEN = body.access_token;
+      res.send({
+        'access_token': ACCESS_TOKEN
+      });
+    }
+  });
+});
+
+
+// router.get('/userSpotifyInfo', (req, res, err) => {
+//
+// })
 
 module.exports = router

@@ -4,18 +4,14 @@ const Schema = mongoose.Schema
 
 const eventSchema = new Schema({
   id: String,
+  eventCreator: Object,
+  eventReceiver: Object,
   title: String,
-  artist: String,
   musicType: [String],
   description: String,
   participantUsers: [Schema.Types.ObjectId],
   comments: [],
-  location: {
-    street: String,
-    zipCode: Number,
-    city: String
-  },
-  link: String,
+  deleted: Boolean,
   date: { type: Date, default: Date.now }
 })
 

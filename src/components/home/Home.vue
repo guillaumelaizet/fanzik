@@ -3,23 +3,23 @@
     <div class="landing-page-content bg1" id="image-background">
       <div class="large-logo">Join the new fan's music community</div>
       <div class="btn-auth">
-        <div v-on:click="goToLogin($event)" class="btn btn-primary btn-lg btn-link-login">LOGIN</div>
+        <div v-on:click="goToLogin($event)" class="btn btn-primary btn-lg btn-link-login">SIGNIN</div>
         <div v-on:click="goToSignin()" class="btn btn-success btn-lg btn-link-signin">SIGNUP</div>
       </div>
     </div>
     <div class="landing-description">
-      <div class="container">
-
+      <div class="text-info">
+        <font-awesome-icon class="icon icon-info" icon="music"/>
+        Find shows near you.<br>
       </div>
-      <div class="">
-
+      <div class="text-info">
+        <font-awesome-icon class="icon icon-info" icon="users"/>
+        Build your community.<br>
       </div>
-      <div class="">
-
+      <div class="text-info">
+        <font-awesome-icon class="icon icon-info" icon="thumbs-up"/>
+        Start your journey.
       </div>
-      Find shows near you.<br>
-      Build your community.<br>
-      Start your journey.
     </div>
 
     <!-- ---------------------------------------------------- Popup Auth --------------------------------------------------------------- -->
@@ -50,7 +50,7 @@
       </div>
     </popupauth>
 
-    <popupauth ref="popup-signin">
+    <popupauth ref="popupRegister">
       <div slot="header">
         <h2>SignIn</h2>
       </div>
@@ -77,12 +77,22 @@
               <input id="password" name="password" type="password" class="form-control rounded-0" title="votre mot de passe doit contenir au moins 8 caractères" v-model="userSignInData.password">
             </div>
           </div>
+          <div class="form-group">
+            <label for="country">Pays</label>
+            <select class="form-control" v-model="userSignInData.country">
+              <option value="France" v-for="country in countries" :key="country.code">{{country.name}}</option>
+            </select>
+          </div>
           <button v-on:click="signIn(userSignInData)" type="button" class="btn btn-primary float-right btn-signin">SignIn</button>
         </form>
       </div>
     </popupauth>
 
-    <popup ref="popup-success-signin">
+    <popupauth>
+
+    </popupauth>
+
+    <popup ref="popupSuccessRegister">
       <div slot="body">
         <div class="headline-blue">
           <img src="/assets/checked.svg" width="48px" height="48px" />
@@ -104,7 +114,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
+// import Vue from 'vue'
 import Service from '../../service/serviceReal.js'
 import Popup from '../popup/Popup'
 import PopupAuth from '../popup/PopupAuth'
@@ -121,18 +131,42 @@ export default {
   data () {
     return {
       userLoginData: {},
-      userSignInData: {}
+      userSignInData: {},
+      countries: []
     }
   },
 
+  created: function () {
+    EventBus.$on('pressRegisterButton', () => {
+      this.$refs.popupRegister.show = true
+    })
+    EventBus.$on('pressLoginButton', () => {
+      this.$refs.popupLogin.show = true
+    })
+    this.countries = Service.instance.getCountriesList()
+    // console.log(Service.instance.fetchMusics())
+  },
+
   mounted: function () {
-    let doc = document.getElementById('image-background')
-    console.log(doc)
-    // setInterval(() => {
-    //   let i = 0
-    //   doc.removeClass('bg1', 'bg2', 'bg3', 'bg4').addClass('bg' + i)
-    //   i++
+    // EventBus.$on('pressLoginButton', () => {
+    //   this.$refs.popupLogin.show = true
     // })
+    // let doc = document.getElementById('image-background')
+    // console.log(doc.classList)
+    // doc.classList.add('abcd')
+    // let i = 0
+    // setInterval(() => {
+    //   i++
+    //   if (i <= 4) {
+    //     console.log(i)
+    //
+    //     doc.classList.remove('bg1', 'bg2', 'bg3', 'bg4')
+    //     doc.classList.add('bg' + i)
+    //     console.log(doc.classList);
+    //   } else {
+    //     i = 0
+    //   }
+    // }, 5000)
   },
 
   methods: {
@@ -141,36 +175,35 @@ export default {
     },
 
     goToSignin () {
-      // console.log(this.$router)
-      // console.log(this.$route)
-      // this.$router.push('/wallme')
-      this.$refs['popup-signin'].show = true
+      this.$refs.popupRegister.show = true
     },
 
     login (userData) {
       Service.instance.login(userData).then((response) => {
         this.$refs.popupLogin.close()
-        localStorage.setItem('token', response.body.token)
-        Vue.http.headers.common['Authorization'] = `Bearer ${response.body.token}`
+        console.log(response.body.token)
+        Service.instance.storeSessionId(response.body.token)
         EventBus.$emit('isAuthenticate')
         console.log('login')
-        this.$router.push('wallme')
+        this.$router.push('home')
+        // this.$router.push('home?access_token=' + window.localStorage.getItem('spotify_access_token') + '&refresh_token=' + window.localStorage.getItem('spotify_refresh_token'))
       })
     },
 
     signIn (userData) {
+      console.log(userData)
       Service.instance.register(userData).then((response) => {
-        console.log(response.body)
-        this.$refs['popup-signin'].close()
-        this.$refs['popup-success-signin'].show = true
-        localStorage.setItem('token', response.body.token)
+        this.$refs.popupRegister.close()
+        this.$refs.popupSuccessRegister.show = true
+        Service.instance.storeSessionId(response.body.token)
       })
     },
 
     goToProfile () {
-      this.$refs['popup-success-signin'].close()
+      this.$refs.popupSuccessRegister.close()
       EventBus.$emit('isAuthenticate')
-      this.$router.push('wallme')
+      this.$router.push('home')
+      // this.$router.push('home?access_token=' + window.localStorage.getItem('spotify_access_token') + '&refresh_token=' + window.localStorage.getItem('spotify_refresh_token'))
     }
   }
 
@@ -183,7 +216,7 @@ export default {
   background-image: url('../../assets/music-background.jpg')
 }
 .bg2 {
-  background-image: url('../../assets/music-background.jpg')
+  background-image: url('../../assets/music-background2.jpg')
 }
 .bg3 {
   background-image: url('../../assets/music-background.jpg')
@@ -197,7 +230,7 @@ width: 100%;
 height: 600px;
 display: flex;
 flex-direction: column;
-margin: 0vh auto 10vh auto;
+margin: 0vh auto 2vh auto;
 background-color: #0e1111;
 opacity: 0.8;
 /* border-radius:20px; */
@@ -215,8 +248,29 @@ margin-bottom: 5vh;
 .landing-description {
 opacity: 0.5;
 font-size: 1.1em;
-padding-bottom: 5vh;
+/* padding: 5vh 0; */
 text-align: center;
+width: 100%;
+height: 150px;
+display: flex;
+background: lightgrey;
+margin-bottom: 20px;
+}
+
+.text-info {
+  width: 35%;
+  margin: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.icon-info {
+  background: none !important;
+  color: inherit !important;
+  margin: auto;
+  min-width: 50px;
+  min-height: 50px;
 }
 
 .landing-registration-link, .landing-logIn-link {
@@ -250,6 +304,16 @@ justify-content: space-around;
 .btn-login {
   margin: 10px 0 10px 0;
   background: #FFA500;
+  border: none;
+}
+
+.btn-primary {
+  background: #FFA500;
+  border: none;
+}
+
+.btn-success {
+  background: red;
   border: none;
 }
 </style>
