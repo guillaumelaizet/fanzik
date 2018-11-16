@@ -48,6 +48,18 @@ class Service {
     return this.sessionId
   }
 
+  setAccessToken (token) {
+    window.localStorage.setItem('spotify_access_token', token)
+  }
+
+  getAccessToken () {
+    return window.localStorage.getItem('spotify_access_token')
+  }
+
+  getRefreshToken () {
+    return window.localStorage.getItem('spotify_refresh_token')
+  }
+
   setAuthorizationHeader (token) {
     if (token) {
       Vue.http.headers.common['Authorization'] = `Bearer ${token}`
@@ -146,9 +158,8 @@ class Service {
     })
   }
 
-  fetchArtists (q) {
-    console.log(q)
-    const url = `http://localhost:3000/api/search/artists/${q}`
+  fetchArtists (token, q) {
+    const url = `http://localhost:3000/api/search/artists/${token}/${q}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response)
@@ -185,11 +196,12 @@ class Service {
     })
   }
 
-  refreshSpotifyToken () {
-    console.log('entering refresh token')
-    const url = 'http://localhost:3000/api/refresh_token'
-    return new Promise ((resolve, reject) => {
+  refreshSpotifyToken (token) {
+    console.log('refresh from service')
+    const url = `http://localhost:3000/api/refresh_token/${token}`
+    return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
+        console.log(response.data)
         resolve(response.data)
       },
       (error) => {
@@ -206,6 +218,16 @@ class Service {
       },
       (error) => {
         console.log(error)
+      })
+    })
+  }
+
+  fetchUserWollowing (token) {
+    console.log('entering following')
+    const url = `http://localhost:3000/api/user/spotify/following/${token}`
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        resolve(response.data)
       })
     })
   }

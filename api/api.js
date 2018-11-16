@@ -752,8 +752,6 @@ router.get('/discussions', verifyToken, (req, res) => {
 var client_id = '9f854027e27f459bbe6fa01599ff86f7'; // Your client id
 var client_secret = '9d14626ea88d4f46a8d858fd4a957efe'; // Your secret
 var redirect_uri = 'http://localhost:8080/home'; // Your redirect uri
-var ACCESS_TOKEN = ''
-var REFRESH_TOKEN = ''
 
 router.use(cors())
 /**
@@ -794,7 +792,7 @@ router.get('/spotify/login',  function(req, res) {
   // console.log(res.cookie(stateKey))
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email';
+  var scope = 'user-read-private user-read-email user-follow-read';
   let url = 'https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -848,14 +846,14 @@ router.get('/callback', function(req, res) {
       let data = {}
       if (!error && response.statusCode === 200) {
         console.log(body.access_token)
-        ACCESS_TOKEN = body.access_token,
-        REFRESH_TOKEN = body.refresh_token;
+        let access_token = body.access_token,
+            refresh_token = body.refresh_token;
 
-        console.log('Access_TOken ' + ACCESS_TOKEN)
+        console.log('Access_TOken ' + access_token)
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+          headers: { 'Authorization': 'Bearer ' + access_token },
           json: true
         };
 
@@ -870,7 +868,7 @@ router.get('/callback', function(req, res) {
           //     access_token: access_token,
           //     refresh_token: refresh_token
           //   })
-          res.send({url:url, access_token: ACCESS_TOKEN, refresh_token: REFRESH_TOKEN, data: data})
+          res.send({url:url, access_token: access_token, refresh_token: refresh_token, data: data})
         });
 
         // we can also pass the token to the browser to make requests from there
@@ -892,13 +890,13 @@ router.get('/callback', function(req, res) {
 
 
 router.get('/user/spotify/playlist/:access_token', (req, res) => {
-  let access_token = ACCESS_TOKEN
+  let access_token = req.params.access_token
   console.log(access_token)
   let playlists = {}
 
   let options = {
     url: 'https://api.spotify.com/v1/me/playlists?limit=50',
-    headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+    headers: { 'Authorization': 'Bearer ' + access_token },
     json: true
   }
 
@@ -917,7 +915,7 @@ router.get('/user/spotify/playlist/:access_token', (req, res) => {
     console.log('playlist' + playlist)
     options = {
       url: `https://api.spotify.com/v1/playlists/${playlist[0].id}/tracks`,
-      headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+      headers: { 'Authorization': 'Bearer ' + access_token },
       json: true
     }
 
@@ -934,13 +932,14 @@ router.get('/user/spotify/playlist/:access_token', (req, res) => {
   })
 })
 
-router.get('/search/artists/:q', (req, res) => {
+router.get('/search/artists/:token/:q', (req, res) => {
+  let access_token = req.params.token
   let q = req.params.q
-  console.log('access_token' + ACCESS_TOKEN)
+  console.log('access_token' + access_token)
 
   let options = {
     url: `https://api.spotify.com/v1/search?q=${q}&type=artist` ,
-    headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+    headers: { 'Authorization': 'Bearer ' + access_token },
     q: q,
     type: 'artist',
     json: true
@@ -948,15 +947,31 @@ router.get('/search/artists/:q', (req, res) => {
 
   request.get(options, q, (error, response, body) => {
     console.log(body)
+    console.log('sending Info')
     res.send(body)
   })
 })
 
-router.get('/refresh_token', function(req, res) {
+router.get('/user/spotify/following/:token', (req, res) => {
+  console.log('lolololo')
+  let access_token = req.params.token
+  console.log(access_token)
 
+  let options = {
+    url:  'https://api.spotify.com/v1/me/following?type=artist&limit=50',
+    headers: { 'Authorization' : 'Bearer ' + access_token},
+    json: true
+  }
 
-  // requesting access token from refresh token
-  var refresh_token = REFRESH_TOKEN;
+  request.get(options, (error, response, body) => {
+    console.log(body)
+    res.send(body)
+  })
+})
+
+router.get('/refresh_token/:token', function(req, res) {
+  var refresh_token = req.params.token;
+  console.log('refresh'  + refresh_token)
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
@@ -969,10 +984,13 @@ router.get('/refresh_token', function(req, res) {
 
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
-      ACCESS_TOKEN = body.access_token;
+      access_token = body.access_token;
+      console.log('send new access_token')
       res.send({
-        'access_token': ACCESS_TOKEN
+        'access_token': access_token
       });
+    } else {
+      console.log(response)
     }
   });
 });

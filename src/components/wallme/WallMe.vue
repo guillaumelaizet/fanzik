@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="blocglobal">
-    <button type="button" name="button" class="btn" v-on:click="AuthSpotify()">Se connecter avec spotify</button>
-    <button type="button" name="button" v-on:click="getUserPlaylists()"> Afficher playlist</button>
+    <button type="button" name="button" class="btn" v-on:click="authSpotify()" v-if="spoti_auth === false">Se connecter avec spotify</button>
+    <!-- <button type="button" name="button" v-on:click="getUserPlaylists()"> Afficher playlist</button> -->
     <div class="blocinter">
       <div class="globalEvents">
         <h1>GlobalEvents</h1>
@@ -32,58 +32,53 @@ import route from '../../router/index.js'
 export default {
   name: 'wallme',
 
+  data () {
+    return {
+      spoti_auth: false
+    }
+  },
+
   created: function () {
-    // console.log('header in wallme ' + Vue.http.headers.common['Authorization'])
+    console.log('test' + route.history.current.query.code)
+    console.log(this.spoti_auth)
+    if (Service.instance.getAccessToken() === null && route.history.current.query.code === undefined) {
+      console.log('enter auth')
+      this.authSpotify()
+    }
+
+    if (window.localStorage.getItem('spotify_access_token')) {
+      this.spoti_auth = true
+    }
     Service.instance.getToken()
     Service.instance.fetchMe().then((response) => {
-      // console.log(response)
-      // console.log(route.history.current.query)
-      if (route.history.current.query.code) {
+      if (route.history.current.query.code !== undefined) {
         console.log('entering fetchSpotify info')
         let code = route.history.current.query.code
         let state = route.history.current.query.state
         Service.instance.receiveSpotifyCredentials(code, state).then((response) => {
           console.log(response)
-          // if (!window.localStorage.getItem('spotify_access_token')) {
-          //   window.localStorage.setItem('spotify_access_token', response.access_token)
-          // }
-          // if (!window.localStorage.getItem('spotify_refresh_token')) {
-          //   window.localStorage.setItem('spotify_refresh_token', response.refresh_token)
-          // }
-          window.location.href = response.url
+          if (!window.localStorage.getItem('spotify_access_token')) {
+            window.localStorage.setItem('spotify_access_token', response.access_token)
+          }
+          if (!window.localStorage.getItem('spotify_refresh_token')) {
+            window.localStorage.setItem('spotify_refresh_token', response.refresh_token)
+          }
+          this.spoti_auth = true
+          // window.location.href = response.url
         })
       }
-
-      // if (route.history.current.query.access_token || window.localStorage.getItem('spotify_access_token') !== '') {
-      //   let accessToken = route.history.current.query.access_token
-        // Service.instance.fetchUserPlaylist(accessToken).then((response) => {
-        //   console.log(response)
-        // })
-      // }
-      // Service.instance.fetchMusics().then((response) => {
-      //   console.log(response.data.search.events)
-      //   console.log(response.data.search.events.event[0])
-      //   let events = response.data.search.events.event
-      //   events.forEach((event) => {
-      //     console.log(event.performers.performer.name)
-      //   })
-      // })
     })
   },
 
   methods: {
-    AuthSpotify () {
+    authSpotify () {
       Service.instance.spotifyAuthentication().then((response) => {
         console.log(response)
-
-        // document.cookie = 'spotify_auth_state=' + response.cookie
         window.location.href = response.url
       })
     },
 
     getUserPlaylists () {
-      window.localStorage.setItem('spotify_access_token', route.history.current.query.access_token)
-      // window.local
       let accessToken = route.history.current.query.access_token
       Service.instance.fetchUserPlaylist(accessToken).then((response) => {
         console.log(response)
