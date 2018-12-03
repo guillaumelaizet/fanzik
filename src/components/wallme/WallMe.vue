@@ -250,6 +250,7 @@ export default {
     buildScreen () {
       let id = route.history.current.params.id
       if (route.history.current.query.code !== undefined) {
+        console.log('go receive credentials')
         this.receiveSpotifyCredentials()
       }
       // document.getElementById('spinner').style.display = 'initial'
