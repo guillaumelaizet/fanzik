@@ -26,14 +26,14 @@ const router = new Router({
           console.log('redirected to home')
           EventBus.$emit('isAuthenticate')
           console.log(Service.instance.getStoredId())
-          next('/home/' + Service.instance.getStoredId())
+          next('/home/?id=' + Service.instance.getStoredId())
         } else {
           next()
         }
       }
     },
     {
-      path: '/home/:id',
+      path: '/home',
       name: 'wallme',
       component: WallMe
     },

@@ -162,7 +162,7 @@ export default {
         Service.instance.storeSessionId(response.body.token)
         Service.instance.storeId(response.body.user._id)
         EventBus.$emit('isAuthenticate')
-        this.$router.push('home/' + this.user._id)
+        this.$router.push({path: 'home/', query: { id: response.body.user._id}})
       })
     },
 
@@ -180,7 +180,7 @@ export default {
     goToProfile () {
       this.$refs.popupSuccessRegister.close()
       EventBus.$emit('isAuthenticate')
-      this.$router.push('home/' + this.user._id)
+      this.$router.push({path: 'home/', query: { id: response.body.user._id}})
     }
   }
 

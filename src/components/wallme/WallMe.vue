@@ -248,7 +248,7 @@ export default {
   methods: {
 
     buildScreen () {
-      let id = route.history.current.params.id
+      let id = route.history.current.query.id
       console.log(route.history.current.query.code)
       if (route.history.current.query.code !== undefined) {
         console.log('go receive credentials')
@@ -265,7 +265,7 @@ export default {
           console.log('pending request ' + user.body)
           this.pendingRequest = user.body
         })
-        if (route.history.current.params.id === this.userMe._id) {
+        if (route.history.current.query.id === this.userMe._id) {
           console.log('my wall')
           this.currentUser = this.userMe
           if (this.me.friends.length <= 1) {
