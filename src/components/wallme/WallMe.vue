@@ -204,9 +204,11 @@ export default {
       this.friends.forEach((friend) => {
         friendsId.push(friend._id)
       })
-      return this.users.filter((user) => {
-        return friendsId.indexOf(user._id) === -1
-      })
+      if (this.users && this.users.length > 0) {
+        return this.users.filter((user) => {
+          return friendsId.indexOf(user._id) === -1
+        })
+      }
     },
 
     meWall () {
@@ -253,81 +255,40 @@ export default {
       if (route.history.current.query.code !== undefined) {
         console.log('go receive credentials')
         this.receiveSpotifyCredentials()
-      }
-      // document.getElementById('spinner').style.display = 'initial'
-      Service.instance.fetchMe().then((response) => {
-        this.userMe = response
-        console.log('userMe ' + this.userMe)
-        Service.instance.fetchFriends(this.userMe._id).then((friends) => {
-          this.myFriends = friends.body
-        })
-        Service.instance.fetchPending(this.userMe._id).then((user) => {
-          console.log('pending request ' + user.body)
-          this.pendingRequest = user.body
-        })
-        if (route.history.current.query.id === this.userMe._id) {
-          console.log('my wall')
-          this.currentUser = this.userMe
-          if (this.me.friends.length <= 1) {
-            Service.instance.fetchAllUsers().then((users) => {
-              this.users = users.body
-            })
-          }
-          Service.instance.fetchFriends(this.userMe._id).then((friends) => {
-            this.friends = friends.body
-            console.log('friends ' + this.friends)
-            let ids = []
-            this.friends.forEach((friend) => {
-              ids.push(friend._id)
-            })
-            Service.instance.fetchFavorite(this.userMe._id).then((events) => {
-              document.getElementById('spinner').style.display = 'none'
-              this.interestedEvents = events.filter((event) => {
-                if (event.interestedUsers.length > 0) {
-                  return event.interestedUsers.filter((user) => {
-                    return user._id === this.userMe._id
-                  })
-                } else {
-                  this.interestedUsers = []
-                }
-              })
-              this.participateEvents = events.filter((event) => {
-                if (event.participantUsers.length > 0) {
-                  return event.participantUsers.filter((user) => {
-                    return user._id === this.userMe._id
-                  })
-                } else {
-                  this.participantUsers = []
-                }
-              })
-              this.events = events
-              this.fetchPostFromMe()
-            })
-          })
+      } else {
 
-          globalData.setMeInfo(response)
-          if (this.userMe.access_token) {
-            this.spoti_auth = true
-            this.fetchSpotifyInfo(this.userMe.access_token)
-          }
-        } else {
-          // console.log('id' + id)
-          Service.instance.fetchUser(id).then((user) => {
-            this.currentUser = user
-            console.log(this.currentUser)
-            Service.instance.fetchFriends(this.currentUser._id).then((friends) => {
+        // document.getElementById('spinner').style.display = 'initial'
+        Service.instance.fetchMe().then((response) => {
+          this.userMe = response
+          console.log('userMe ' + this.userMe)
+          Service.instance.fetchFriends(this.userMe._id).then((friends) => {
+            this.myFriends = friends.body
+          })
+          Service.instance.fetchPending(this.userMe._id).then((user) => {
+            console.log('pending request ' + user.body)
+            this.pendingRequest = user.body
+          })
+          if (route.history.current.query.id === this.userMe._id) {
+            console.log('my wall')
+            this.currentUser = this.userMe
+            if (this.me.friends.length <= 1) {
+              Service.instance.fetchAllUsers().then((users) => {
+                this.users = users.body
+              })
+            }
+            Service.instance.fetchFriends(this.userMe._id).then((friends) => {
               this.friends = friends.body
+              console.log('friends ' + this.friends)
               let ids = []
-              console.log(this.friends)
               this.friends.forEach((friend) => {
                 ids.push(friend._id)
               })
-              Service.instance.fetchFavorite(this.currentUser._id).then((events) => {
+              Service.instance.fetchFavorite(this.userMe._id).then((events) => {
                 document.getElementById('spinner').style.display = 'none'
                 this.interestedEvents = events.filter((event) => {
                   if (event.interestedUsers.length > 0) {
                     return event.interestedUsers.filter((user) => {
-                      return user._id === this.currentUser._id
+                      return user._id === this.userMe._id
                     })
                   } else {
                     this.interestedUsers = []
@@ -336,25 +297,68 @@ export default {
                 this.participateEvents = events.filter((event) => {
                   if (event.participantUsers.length > 0) {
                     return event.participantUsers.filter((user) => {
-                      return user._id === this.currentUSer._id
+                      return user._id === this.userMe._id
                     })
                   } else {
                     this.participantUsers = []
                   }
                 })
                 this.events = events
-                this.fetchPostFromCurrentUser()
+                this.fetchPostFromMe()
               })
             })
 
             globalData.setMeInfo(response)
-            if (this.me.access_token) {
+            if (this.userMe.access_token) {
               this.spoti_auth = true
-              this.fetchSpotifyInfo(this.me.access_token)
+              this.fetchSpotifyInfo(this.userMe.access_token)
             }
-          })
-        }
-      })
+          } else {
+            // console.log('id' + id)
+            Service.instance.fetchUser(id).then((user) => {
+              this.currentUser = user
+              console.log(this.currentUser)
+              Service.instance.fetchFriends(this.currentUser._id).then((friends) => {
+                this.friends = friends.body
+                let ids = []
+                console.log(this.friends)
+                this.friends.forEach((friend) => {
+                  ids.push(friend._id)
+                })
+                Service.instance.fetchFavorite(this.currentUser._id).then((events) => {
+                  document.getElementById('spinner').style.display = 'none'
+                  this.interestedEvents = events.filter((event) => {
+                    if (event.interestedUsers.length > 0) {
+                      return event.interestedUsers.filter((user) => {
+                        return user._id === this.currentUser._id
+                      })
+                    } else {
+                      this.interestedUsers = []
+                    }
+                  })
+                  this.participateEvents = events.filter((event) => {
+                    if (event.participantUsers.length > 0) {
+                      return event.participantUsers.filter((user) => {
+                        return user._id === this.currentUSer._id
+                      })
+                    } else {
+                      this.participantUsers = []
+                    }
+                  })
+                  this.events = events
+                  this.fetchPostFromCurrentUser()
+                })
+              })
+
+              globalData.setMeInfo(response)
+              if (this.me.access_token) {
+                this.spoti_auth = true
+                this.fetchSpotifyInfo(this.me.access_token)
+              }
+            })
+          }
+        })
+      }
     },
     // ----------------------------------- Spoti ------------------------
     authSpotify () {
@@ -364,9 +368,12 @@ export default {
     },
 
     receiveSpotifyCredentials () {
+      console.log('credential')
       let code = route.history.current.query.code
       let state = route.history.current.query.state
-      Service.instance.receiveSpotifyCredentials(code, state).then((response) => {
+      let id = window.localStorage.getItem('fanzik-id')
+      Service.instance.receiveSpotifyCredentials(id, code, state).then((response) => {
+        console.log(response)
         let spotiInfo = response.data
         let url = response.url
         Service.instance.saveTokens({access_token: response.access_token, refresh_token: response.refresh_token, avatar: spotiInfo.images[0].url}).then((response) => {

@@ -415,8 +415,9 @@ class Service {
     })
   }
 
-  receiveSpotifyCredentials (code, state) {
-    const url = `${path}api/callback?code=${code}&state=${state}`
+  receiveSpotifyCredentials (id, code, state) {
+    console.log('entering callback')
+    const url = `${path}api/callback?code=${code}&state=${state}&id=${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         console.log(response.data)

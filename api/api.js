@@ -908,6 +908,8 @@ router.get('/discussions', verifyToken, (req, res) => {
 var client_id = '9f854027e27f459bbe6fa01599ff86f7';
 var client_secret = '9d14626ea88d4f46a8d858fd4a957efe';
 var redirect_uri = 'http://www.fanzik.org/home';
+// var redirect_uri = 'http://localhost:8080/home';
+
 
 router.use(cors())
 /**
@@ -974,6 +976,7 @@ router.get('/callback', function(req, res) {
   console.log(req.cookies)
   var code = req.query.code || null;
   var state = req.query.state || null;
+  var id = req.query.id
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   if (state === null || state !== storedState) {
     res.redirect('/#' +
@@ -1014,7 +1017,7 @@ router.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
           data = body
-          let url = 'www.fanzik.org/home?auth=accept'
+          let url = `www.fanzik.org/home?id=${id}&auth=accept`
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
           //     access_token: access_token,
