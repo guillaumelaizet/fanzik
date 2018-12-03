@@ -24,7 +24,7 @@ app.use(history({
 app.use('/api', api)
 
 app.get('/', (req, res) => {
-  res.render.(path.join(__dirname + '/dist/index.html'))
+  res.render(path.join(__dirname + '/dist/index.html'))
 })
 
 app.use(serveStatic(path.join(__dirname, 'dist')))
