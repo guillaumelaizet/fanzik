@@ -977,6 +977,7 @@ router.get('/callback', function(req, res) {
   var code = req.query.code || null;
   var state = req.query.state || null;
   var id = req.query.id
+  console.log('state' + state)
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   if (state === null || state !== storedState) {
     res.redirect('/#' +
@@ -1017,6 +1018,7 @@ router.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
           data = body
+          console.log(data)
           let url = `www.fanzik.org/home?id=${id}&auth=accept`
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
