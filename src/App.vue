@@ -150,7 +150,7 @@ export default {
 
     goToWallMe () {
       console.log(this.user)
-      this.$router.push('/home/?id=' + this.user._id)
+      this.$router.push('/home?id=' + this.user._id)
     },
 
     goToSettings () {
