@@ -234,7 +234,7 @@ class Service {
 
   fetchFavorite (id) {
     // console.log('id ' + id)
-    const url = `${parh}api/events/favorite/${id}`
+    const url = `${path}api/events/favorite/${id}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {

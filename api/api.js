@@ -1016,7 +1016,7 @@ router.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
           data = body
-          let url = 'http://localhost:8080/home?auth=accept'
+          let url = 'www.fanzik.org/home?auth=accept'
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
           //     access_token: access_token,
