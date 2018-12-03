@@ -79,7 +79,7 @@ class Service {
   // --------------------------------------------------------- Auth -------------------------------------------------------
 
   register (userData) {
-    const url = 'www.fanzik.org/api/register'
+    const url = 'http://www.fanzik.org/api/register'
     let params = {
       pseudo: userData.pseudo,
       email: userData.email,
@@ -98,7 +98,7 @@ class Service {
   }
 
   login (userData) {
-    const url = 'www.fanzik.org/api/login'
+    const url = 'http://www.fanzik.org/api/login'
     let params = {
       pseudo: userData.pseudo,
       password: userData.password
