@@ -6,7 +6,6 @@ const api = require('./api/api')
 const cookieParser = require('cookie-parser')
 // const spotifyOauth = require('./api/spotifyOauth')
 const history = require('connect-history-api-fallback');
-
 const cors = require('cors')
 
 const app = express()
@@ -24,7 +23,9 @@ app.use(history({
 
 app.use('/api', api)
 
-
+app.get('/', (req, res) => {
+  res.render.(path.join(__dirname + '/dist/index.html'))
+})
 
 app.use(serveStatic(path.join(__dirname, 'dist')))
 
