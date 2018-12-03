@@ -907,7 +907,7 @@ router.get('/discussions', verifyToken, (req, res) => {
 
 var client_id = '9f854027e27f459bbe6fa01599ff86f7';
 var client_secret = '9d14626ea88d4f46a8d858fd4a957efe';
-var redirect_uri = 'http://fanzik.org/home';
+var redirect_uri = 'http://www.fanzik.org/home';
 
 router.use(cors())
 /**
