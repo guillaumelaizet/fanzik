@@ -79,7 +79,7 @@ class Service {
   // --------------------------------------------------------- Auth -------------------------------------------------------
 
   register (userData) {
-    const url = 'http://localhost:3000/api/register'
+    const url = 'api/register'
     let params = {
       pseudo: userData.pseudo,
       email: userData.email,
@@ -98,7 +98,7 @@ class Service {
   }
 
   login (userData) {
-    const url = 'http://localhost:3000/api/login'
+    const url = 'api/login'
     let params = {
       pseudo: userData.pseudo,
       password: userData.password
