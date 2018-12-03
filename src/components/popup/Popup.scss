@@ -1,38 +1,9 @@
-.modal-button {
-  width: 260px;
-  background-color: blue;
-  border: 1px solid blue;
-  color: white;
-  font-size: 20px;
-  // font-weight: 900;
-  cursor: pointer;
-  margin: auto 20px;
-  padding: 10px;
-}
+@import '../../style/variables.styl';
 
-
-.modal-button-light {
-  width: 260px;
-  background-color: white;
-  color: blue;
-  border: 1px solid blue;
-  font-size: 20px;
-  font-weight: 900;
-  cursor: pointer;
-  margin: auto 20px;
-  padding: 10px;
-}
-
-.headline-blue {
-  font-size: 16px;
-  font-weight: 900;
-  color: #2099cf;
-}
 
 
 .modal-mask {
   position: fixed;
-  z-index: 99998;
   top: 0;
   left: 0;
   width: 100%;
@@ -48,6 +19,7 @@
 }
 
 .modal-container {
+
   width: 500px;
   margin: 0px auto;
   padding: 15px 30px;
@@ -55,17 +27,19 @@
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
   transition: all .3s ease;
-  font-family: Helvetica, Arial, sans-serif;
+  // font-family: Helvetica, Arial, sans-serif;
 }
 
 .modal-header {
+  margin: auto;
   // font-family 'Roboto Condensed', Verdana, Geneva, Arial
 }
 
 
+
 .modal-header h3 {
   margin-top: 0;
-  color: #42b983;
+  // color: #42b983;
 }
 
 .modal-body {

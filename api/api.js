@@ -14,17 +14,18 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 
 const eventful = require('eventful-node')
-console.log(new eventful.Client('KNTLkbbm3QH6vhQf'))
-
 const client = new eventful.Client('KNTLkbbm3QH6vhQf')
 
 const User = require('../models/user')
 const Event = require('../models/event')
+const Post = require('../models/post')
 
-const url = 'mongodb://localhost:27017/musicProject'
-// const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
+// const url = 'mongodb://localhost:27017/fanzik'
+const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
 
 const EventFul = 'http://api.eventful.com/js/api'
+
+const adminId = '5c03b8bfbd890635ccaaf2ca'
 
 router.use(cors())
 
@@ -85,18 +86,6 @@ function verifyToken(req, res, next) {
 //     })
 //   }
 // })
-
-router.get('/home/:q', (req, res) => {
-  let q = req.params.q
-  console.log(q)
-  client.searchEvents({keywords: q, within: 'title', page_size: 20, category: 'music'}, (err, data) => {
-    if (err) {
-      return console.error(err)
-    }
-    console.log(data)
-    res.status(200).send({data})
-  })
-})
 
 
 // -------------------------------------------------------------------- Auths ----------------------------------------------------------
@@ -196,8 +185,22 @@ router.post('/register', (req, res, next) => {
                         console.log('Message sent: %s', info.messageId)
                         console.log('preview URL: %s',nodemailer.getTestMessageUrl(info))
                       })
+                      console.log(registeredUser._id)
+                      User.findByIdAndUpdate(registeredUser._id, {$push: {friends : {id: adminId, status: 'confirmed'}}}, {new: true}, (err, registeredUser) => {
+                        if (err) {
+                          return console.log(err)
+                        } if (user) {
+                          console.log(user)
+                          User.findByIdAndUpdate(adminId, {$push : {friends : {id: registeredUser._id, status: 'confirmed'}}},  {new : true}, (err, user) => {
+                            if (err) {
+                              return console.log(err)
+                            }
+                          })
+                          res.status(200).send({token, registeredUser})
+                        }
+                      })
 
-                      res.status(200).send({token, registeredUser})
+                      // res.status(200).send({token, registeredUser})
                     }
                   })
                 }
@@ -353,14 +356,18 @@ router.put('/user/:id', (req, res) => {
 
 router.get('/user/me', verifyToken, (req, res) => {
   let token = req.headers.authorization.split(' ')[1]
+  console.log('token : ' + token)
   let payload = jwt.verify(token, 'secretKey')
-  // console.log('userMe')
+  console.log(payload.subject)
+  console.log('userMe')
   User.findOne({_id: payload.subject}, (err, user) => {
     if (err) {
       console.log(err)
     } if (user) {
+      console.log(user)
       res.status(200).json(user)
     } if (!user) {
+      console.log('noUser')
       res.status(401).send('no user found')
     }
   })
@@ -391,7 +398,7 @@ router.get('/user/:id', verifyToken, (req, res) => {
 router.get('/users/:ids', verifyToken, (req, res) => {
   // console.log('ids   '   + typeof req.params.ids)
 
-  User.find({ $and : [{_id: { $in: JSON.parse(req.params.ids)}}, {deleted : { $ne : true}}]}, (err,users) => {
+  User.find({ $and : [{_id: { $in: req.params.ids}}, {deleted : { $ne : true}}]}, (err,users) => {
     if (err) {
       console.log(err);
     } if (users) {
@@ -402,12 +409,12 @@ router.get('/users/:ids', verifyToken, (req, res) => {
   })
 })
 
-router.get('/allUsers', verifyToken, (req, res) => {
+router.get('/allusers', verifyToken, (req, res) => {
   User.find({}, (err, data) => {
     if (err) {
       console.log(err);
     } if (data) {
-      res.status(200).send(data)
+      res.status(200).json(data)
     }
   })
 })
@@ -426,7 +433,7 @@ router.put('/user/delete/:id', verifyToken, (req,res) => {
 
 
 router.get('/friends/:id', (req, res) => {
-  // console.log('id from fetchfriends : ' + req.params.id)
+  // console.log('from friends fetch ' + req.params.id)
   User.findOne({_id: req.params.id}, (err, user) => {
     if (err) {
       console.log(err);
@@ -434,10 +441,43 @@ router.get('/friends/:id', (req, res) => {
       // console.log('friends    :  ' + user.friends);
       let confirmedFriend = []
       user.friends.forEach((friend) => {
-        if (friend.status == 'confirmé') {
-          confirmedFriend.push(friend._id)
+        console.log(friend.id)
+        if (friend.status == 'confirmed') {
+          let id = friend.id
+        // console.log('friend ' + typeof friend.id);
+          confirmedFriend.push(friend.id)
         }
       })
+      // console.log('confirmedFriend ' + JSON.stringify(confirmedFriend))
+      User.find({$and : [{_id: {$in: confirmedFriend}}, {deleted : { $ne : true}}]}, (err, friends) => {
+        if (err) {
+          console.log(err);
+        } if (friends) {
+          res.status(200).json(friends)
+        }
+      })
+    } if (!user) {
+      res.status(401).send('no user found')
+    }
+  })
+})
+
+router.get('/friend/pending/:id', verifyToken, (req, res) => {
+  User.findOne({_id: req.params.id}, (err, user) => {
+    if (err) {
+      console.log(err);
+    } if (user) {
+      // console.log('friends    :  ' + user.friends);
+      let confirmedFriend = []
+      user.friends.forEach((friend) => {
+        console.log(friend.id)
+        if (friend.status == 'invitation recue') {
+          let id = friend.id
+        // console.log('friend ' + typeof friend.id);
+          confirmedFriend.push(friend.id)
+        }
+      })
+      // console.log('confirmedFriend ' + JSON.stringify(confirmedFriend))
       User.find({$and : [{_id: {$in: confirmedFriend}}, {deleted : { $ne : true}}]}, (err, friends) => {
         if (err) {
           console.log(err);
@@ -452,24 +492,23 @@ router.get('/friends/:id', (req, res) => {
 })
 
 router.put('/friend/invite', verifyToken, (req, res) => {
-  // console.log(JSON.stringify(req.body))
-  let askingUser = req.body.askingUser
-  let receivingUser = req.body.receivingUser
-  // console.log(receivingUser);
-  User.findByIdAndUpdate(receivingUser._id, receivingUser, {new: true}, (err, receivingUser) => {
+  console.log(req.body)
+  let asking = req.body.asking
+  let receiving = req.body.receiving
+
+  User.findByIdAndUpdate(receiving.id, {$push : { friends : { id: asking.id, status: asking.status}}}, {new: true}, (err, userReceiving) => {
     if (err) {
       console.log(err);
-    } if (receivingUser) {
-      console.log('user changed')
-      User.findByIdAndUpdate(askingUser._id, askingUser, {new:true}, (err, askingUser) => {
+    } if (userReceiving) {
+      User.findByIdAndUpdate(asking.id, {$push : { friends : { id: receiving.id, status: receiving.status}}}, {new:true}, (err, userAsking) => {
         if (err) {
           console.log(err);
-        } if (askingUser) {
-          let data = {askingUser, receivingUser}
+        } if (userAsking) {
+          let data = {userAsking, userReceiving}
           res.status(200).json(data)
         }
       })
-    } if (!receivingUser) {
+    } if (!userReceiving) {
       res.status(401).send('no receivingUser found')
     }
   })
@@ -606,6 +645,52 @@ router.put('/friend/friendsuggestion', verifyToken, (req, res) => {
   })
 })
 
+// --------------------------------------------------------------- Posts --------------------------------------------------
+
+router.get('/post/fetch/:id/:ids', (req, res) => {
+  let id = req.params.id
+  console.log(req.params.ids)
+  let friends = req.params.ids
+  console.log(friends.length)
+  // friends.forEach((friend) => {
+  //   ids.push(friends)
+  // })
+  Post.find({ $or : [{creatorId: id}, {creatorId: friends}]}, (err,posts) => {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(posts)
+    res.status(200).json(posts)
+  })
+})
+
+router.post('/post/create', (req, res) => {
+  let post = req.body
+  Post.create(post, (err, post) => {
+    if (err) {
+      return console.log(err)
+    }
+    if (post) {
+      res.status(200).send(post)
+    }
+  })
+})
+
+router.post('/post/comment/create', (req, res) => {
+  let post = req.body
+  console.log(post.idEvent)
+  console.log(post.id)
+  console.log(post.comment)
+  Post.findByIdAndUpdate(post.idEvent, { $push : { "comments": {"id": post.id, "comment": post.comment, "avatar": post.avatar, "pseudo": post.pseudo, "date" : new Date()}}}, {new: true}, (err, event) =>  {
+    if (err) {
+      return console.log(err)
+    }
+    if (event) {
+      console.log(event)
+      res.status(200).json(event)
+    }
+  })
+})
 
 // -------------------------------------------------------------------- Events ----------------------------------------------------------
 
@@ -619,6 +704,40 @@ router.get('/events/:id', verifyToken, (req, res) => {
       res.status(200).json(events)
     } else if (!event) {
       res.status(401).send('No event from user found')
+    }
+  })
+})
+
+router.get('/events/favorite/:id', (req, res) => {
+  let userId = req.params.id
+
+  Event.find({$or : [{'participantUsers._id' : userId}, {'interestedUsers._id': userId}]}, (err, events) => {
+    if (err) {
+      return console.log(err)
+    }
+    if (events) {
+      console.log(events)
+      res.status(200).json(events)
+    } else if (!events) {
+      res.status(401).send('No event')
+    }
+  })
+})
+
+
+router.get('/event/fetch/:id', (req, res) => {
+  let id = req.params.id
+  console.log(id)
+  Event.find({idEvent: id}, (err, event) => {
+    if (err) {
+      return err
+    }
+    if (event.length > 0) {
+      res.status(200).json(event)
+    }
+    else {
+      console.log('not found')
+      res.status(403).send('No Event found')
     }
   })
 })
@@ -673,6 +792,65 @@ router.get('/allevents', verifyToken, (req, res) => {
   })
 })
 
+
+router.post('/event/follow', (req, res) => {
+  let event = req.body
+  console.log(req.body)
+  // console.log(event.id)
+  // console.log(event.interestedUsers)
+  Event.findOneAndUpdate({idEvent: event.idEvent}, {$set: {interestedUsers: event.interestedUsers}}, {new: true}, (err, event) => {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(event)
+    res.status(200).json(event)
+  })
+})
+
+router.post('/event/unfollow', (req, res) => {
+  let event = req.body
+  console.log(req.body)
+  Event.findOneAndUpdate({idEvent: event.idEvent}, {$set: {interestedUsers: event.interestedUsers}}, {new: true}, (err, event) => {
+    if (err) {
+      return console.log(err)
+    }
+    res.status(200).json(event)
+  })
+})
+
+router.post('/event/participate', (req, res) => {
+  let event = req.body
+  console.log();
+  Event.findOneAndUpdate({idEvent: event.idEvent}, {$set: {participantUsers: event.participantUsers}}, {new: true}, (err, event) => {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(event)
+    res.status(200).json(event)
+  })
+})
+
+router.post('/event/unparticipate', (req, res) => {
+  let event = req.body
+  Event.findOneAndUpdate({idEvent: event.idEvent}, {$set: {participantUsers: event.participantUsers}}, {new: true}, (err, event) => {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(event)
+    res.status(200).json(event)
+  })
+})
+
+router.post('/event/create', (req, res) => {
+  let event = req.body
+  console.log(req.body)
+  Event.create(event, (err, event) => {
+    if (err) {
+      return console.log(err)
+    }
+    res.status(200).json(event)
+  })
+})
 
 
 // -------------------------------------------------------------------- Discussions -----------------------------------------------------
@@ -746,12 +924,17 @@ router.get('/discussions', verifyToken, (req, res) => {
 })
 
 
-// ---------------------------------------------------- spotifyOauth -------------------------------------------------------------
+// ---------------------------------------------------- spotify -------------------------------------------------------------
 
 
-var client_id = '9f854027e27f459bbe6fa01599ff86f7'; // Your client id
-var client_secret = '9d14626ea88d4f46a8d858fd4a957efe'; // Your secret
-var redirect_uri = 'http://localhost:8080/home'; // Your redirect uri
+
+                // ------------------------------------- Auth --------------------------------------------
+
+
+
+var client_id = '9f854027e27f459bbe6fa01599ff86f7';
+var client_secret = '9d14626ea88d4f46a8d858fd4a957efe';
+var redirect_uri = 'http://localhost:8080/home';
 
 router.use(cors())
 /**
@@ -792,14 +975,15 @@ router.get('/spotify/login',  function(req, res) {
   // console.log(res.cookie(stateKey))
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email user-follow-read';
+  var scope = 'user-read-private user-read-email user-follow-read user-top-read';
   let url = 'https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
       client_id: client_id,
       scope: scope,
       redirect_uri: redirect_uri,
-      state: state
+      state: state,
+      show_dialog: true
     })
   // res.redirect('https://accounts.spotify.com/authorize?' +
   //   querystring.stringify({
@@ -820,7 +1004,6 @@ router.get('/callback', function(req, res) {
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
-  // console.log(code + ' ' + state + ' ' + storedState)
   if (state === null || state !== storedState) {
     res.redirect('/#' +
       querystring.stringify({
@@ -859,10 +1042,8 @@ router.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          // console.log('receiving data')
-          // console.log(body);
           data = body
-          let url = 'http://localhost:8080/home'
+          let url = 'http://localhost:8080/home?auth=accept'
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
           //     access_token: access_token,
@@ -889,83 +1070,44 @@ router.get('/callback', function(req, res) {
 });
 
 
-router.get('/user/spotify/playlist/:access_token', (req, res) => {
+router.post('/user/tokens/:access_token/:refresh_token', (req, res) => {
+  // console.log('token for save ' + JSON.stringify(JSON.parse(req.params.tokens)))
+  // console.log(typeof req.params.tokens)
+  console.log('req.body ' + req.body.avatar)
   let access_token = req.params.access_token
-  console.log(access_token)
-  let playlists = {}
+  let refresh_token = req.params.refresh_token
+  let avatar = req.body.avatar
+  let id = req.headers.authorization.split(' ')[1]
+  let payload = jwt.verify(id, 'secretKey')
 
-  let options = {
-    url: 'https://api.spotify.com/v1/me/playlists?limit=50',
-    headers: { 'Authorization': 'Bearer ' + access_token },
-    json: true
-  }
-
-  request.get(options, (error, response, body) => {
-    playlists = body.items
-    // console.log(playlists)
-    // for (let playlist in playlists) {
-    //   console.log(playlist)
-    // }
-    let playlist = playlists.filter((playlist) => {
-      // console.log(playlist.name)
-      return playlist.name == 'Inox festival'
-    })
-
-    playlist = Object.assign({}, playlist)
-    console.log('playlist' + playlist)
-    options = {
-      url: `https://api.spotify.com/v1/playlists/${playlist[0].id}/tracks`,
-      headers: { 'Authorization': 'Bearer ' + access_token },
-      json: true
+  User.findOneAndUpdate({_id: payload.subject},{$set : {access_token: access_token, access_token_validate_time: Date.now(), refresh_token: refresh_token, avatar: avatar }}, {new: true}, (err, data) => {
+    if (err) {
+      return console.log(err)
     }
-
-    request.get(options, (error, response, body) => {
-      // console.log(body);
-      let tracks = body.items
-
-      console.log(body.items[0].track.album.artists[0].name)
-      body.items.map((item) => {
-        // console.log(item.track.album.artists[0].name)
-      })
-    })
-
+    console.log('data from save token ' + data)
+    res.status(200).send('Access_token and refresh_token saved')
   })
 })
 
-router.get('/search/artists/:token/:q', (req, res) => {
+router.post('/user/newtoken/:token', (req, res) => {
   let access_token = req.params.token
-  let q = req.params.q
-  console.log('access_token' + access_token)
+  let id = req.headers.authorization.split(' ')[1]
+  let payload = jwt.verify(id, 'secretKey')
 
-  let options = {
-    url: `https://api.spotify.com/v1/search?q=${q}&type=artist` ,
-    headers: { 'Authorization': 'Bearer ' + access_token },
-    q: q,
-    type: 'artist',
-    json: true
-  }
-
-  request.get(options, q, (error, response, body) => {
-    console.log(body)
-    console.log('sending Info')
-    res.send(body)
+  User.findOneAndUpdate({_id: payload.subject}, {$set : {access_token: access_token, access_token_validate_time: Date.now()}}, {new: true}, (err, data) => {
+    res.status(200).send(data)
   })
 })
 
-router.get('/user/spotify/following/:token', (req, res) => {
-  console.log('lolololo')
-  let access_token = req.params.token
-  console.log(access_token)
 
-  let options = {
-    url:  'https://api.spotify.com/v1/me/following?type=artist&limit=50',
-    headers: { 'Authorization' : 'Bearer ' + access_token},
-    json: true
-  }
-
-  request.get(options, (error, response, body) => {
-    console.log(body)
-    res.send(body)
+router.get('/user/access_token/isvalidate', (req, res) => {
+  let id = req.headers.authorization.split(' ')[1]
+  let payload = jwt.verify(id, 'secretKey')
+  User.findOne({_id: payload.subject}, {"access_token_validate_time": 1}, (err, data) => {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(data)
   })
 })
 
@@ -995,9 +1137,336 @@ router.get('/refresh_token/:token', function(req, res) {
   });
 });
 
+                // ------------------------------------- Data --------------------------------------------
 
-// router.get('/userSpotifyInfo', (req, res, err) => {
+router.get('/user/spotify/me/:token', (req, res) => {
+  let access_token = req.params.token
+
+  let options = {
+    url: 'https://api.spotify.com/v1/me',
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    json: true
+  };
+
+  request.get(options, (error, response, body) => {
+    res.send(body)
+  })
+})
+
+
+router.get('/user/spotify/playlist/:access_token', (req, res) => {
+  let access_token = req.params.access_token
+  console.log(access_token)
+  let playlists = {}
+
+  let options = {
+    url: 'https://api.spotify.com/v1/me/playlists?limit=50',
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    json: true
+  }
+
+  request.get(options, (error, response, body) => {
+    playlists = body.items
+    let playlist = playlists.filter((playlist) => {
+      return playlist.name == 'Inox festival'
+    })
+
+    playlist = Object.assign({}, playlist)
+    console.log('playlist' + playlist)
+    options = {
+      url: `https://api.spotify.com/v1/playlists/${playlist[0].id}/tracks`,
+      headers: { 'Authorization': 'Bearer ' + access_token },
+      json: true
+    }
+
+    request.get(options, (error, response, body) => {
+      let tracks = body.items
+
+      console.log(body.items[0].track.album.artists[0].name)
+      body.items.map((item) => {
+      })
+    })
+  })
+})
+
+
+router.get('/user/spotify/artists/:token/:q', (req, res) => {
+  let access_token = req.params.token
+  let q = req.params.q
+
+  let options = {
+    url: `https://api.spotify.com/v1/search?q=${q}&type=artist`,
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    q: q,
+    type: 'artist',
+    json: true
+  }
+
+  request.get(options, (error, response, body) => {
+    res.send(body)
+  })
+})
+
+router.get('/user/spotify/artist/:token/:q', (req, res) => {
+  let access_token = req.params.token
+  let q = req.params.q
+  console.log('access_token' + access_token)
+
+  let options = {
+    url: `https://api.spotify.com/v1/artists/${q}` ,
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    q: q,
+    type: 'artist',
+    json: true
+  }
+
+  request.get(options, q, (error, response, body) => {
+    // console.log(body)
+    // console.log('sending Info')
+    res.send(body)
+  })
+})
+
+router.get('/user/spotify/artist/byname/:token/:q', (req, res) => {
+  let access_token = req.params.token
+  let q = req.params.q
+  console.log('access_token' + access_token)
+
+  let options = {
+    url: `https://api.spotify.com/v1/search?q=${q}&type=artist` ,
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    q: q,
+    type: 'artist',
+    json: true
+  }
+
+  request.get(options, q, (error, response, body) => {
+    // console.log(body)
+    // console.log('sending Info')
+    res.send(body)
+  })
+})
+
+
+router.get('/spotify/artist/relatedartists/:token/:id', (req, res) => {
+  let access_token = req.params.token
+  let id = req.params.id
+
+  let options = {
+    url: `https://api.spotify.com/v1/artists/${id}/related-artists` ,
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    id: id,
+    type: 'artist',
+    json: true
+  }
+
+  request.get(options, id, (error, response, body) => {
+    // console.log(body)
+    res.send(body)
+  })
+})
+
+router.get('/user/spotify/following/:token', (req, res) => {
+  let access_token = req.params.token
+  console.log(access_token)
+
+  let options = {
+    url:  'https://api.spotify.com/v1/me/following?type=artist&limit=50',
+    headers: { 'Authorization' : 'Bearer ' + access_token},
+    json: true
+  }
+
+  request.get(options, (error, response, body) => {
+    console.log(body)
+    res.send(body)
+  })
+})
+
+router.get('/user/spotify/top/:token', (req, res) => {
+  // console.log(req.params.token)
+  let access_token = req.params.token
+
+  let options = {
+    url: `https://api.spotify.com/v1/me/top/artists?limit=50&time_range=medium_term`,
+    headers: { 'Authorization' : 'Bearer ' + access_token },
+    json: true
+  }
+
+  request.get(options, (error, response, body) => {
+    res.send(body)
+  })
+})
+
+
+
+
+
+// ---------------------------------------------------- EventFul -----------------------------------------------------------
+
+function convert_accented_characters(str){
+    var conversions = new Object();
+    conversions[' '] = '[_]';
+    conversions[''] = '^[_]'
+    conversions['ae'] = 'ä|æ|ǽ';
+    conversions['oe'] = 'ö|œ';
+    conversions['ue'] = 'ü';
+    conversions['Ae'] = 'Ä';
+    conversions['Ue'] = 'Ü';
+    conversions['Oe'] = 'Ö';
+    conversions['A'] = 'À|Á|Â|Ã|Ä|Å|Ǻ|Ā|Ă|Ą|Ǎ';
+    conversions['a'] = 'à|á|â|ã|å|ǻ|ā|ă|ą|ǎ|ª';
+    conversions['C'] = 'Ç|Ć|Ĉ|Ċ|Č';
+    conversions['c'] = 'ç|ć|ĉ|ċ|č';
+    conversions['D'] = 'Ð|Ď|Đ';
+    conversions['d'] = 'ð|ď|đ';
+    conversions['E'] = 'È|É|Ê|Ë|Ē|Ĕ|Ė|Ę|Ě';
+    conversions['e'] = 'è|é|ê|ë|ē|ĕ|ė|ę|ě';
+    conversions['G'] = 'Ĝ|Ğ|Ġ|Ģ';
+    conversions['g'] = 'ĝ|ğ|ġ|ģ';
+    conversions['H'] = 'Ĥ|Ħ';
+    conversions['h'] = 'ĥ|ħ';
+    conversions['I'] = 'Ì|Í|Î|Ï|Ĩ|Ī|Ĭ|Ǐ|Į|İ';
+    conversions['i'] = 'ì|í|î|ï|ĩ|ī|ĭ|ǐ|į|ı';
+    conversions['J'] = 'Ĵ';
+    conversions['j'] = 'ĵ';
+    conversions['K'] = 'Ķ';
+    conversions['k'] = 'ķ';
+    conversions['L'] = 'Ĺ|Ļ|Ľ|Ŀ|Ł';
+    conversions['l'] = 'ĺ|ļ|ľ|ŀ|ł';
+    conversions['N'] = 'Ñ|Ń|Ņ|Ň';
+    conversions['n'] = 'ñ|ń|ņ|ň|ŉ';
+    conversions['O'] = 'Ò|Ó|Ô|Õ|Ō|Ŏ|Ǒ|Ő|Ơ|Ø|Ǿ';
+    conversions['o'] = 'ò|ó|ô|õ|ō|ŏ|ǒ|ő|ơ|ø|ǿ|º';
+    conversions['R'] = 'Ŕ|Ŗ|Ř';
+    conversions['r'] = 'ŕ|ŗ|ř';
+    conversions['S'] = 'Ś|Ŝ|Ş|Š';
+    conversions['s'] = 'ś|ŝ|ş|š|ſ';
+    conversions['T'] = 'Ţ|Ť|Ŧ';
+    conversions['t'] = 'ţ|ť|ŧ';
+    conversions['U'] = 'Ù|Ú|Û|Ũ|Ū|Ŭ|Ů|Ű|Ų|Ư|Ǔ|Ǖ|Ǘ|Ǚ|Ǜ';
+    conversions['u'] = 'ù|ú|û|ũ|ū|ŭ|ů|ű|ų|ư|ǔ|ǖ|ǘ|ǚ|ǜ';
+    conversions['Y'] = 'Ý|Ÿ|Ŷ';
+    conversions['y'] = 'ý|ÿ|ŷ';
+    conversions['W'] = 'Ŵ';
+    conversions['w'] = 'ŵ';
+    conversions['Z'] = 'Ź|Ż|Ž';
+    conversions['z'] = 'ź|ż|ž';
+    conversions['AE'] = 'Æ|Ǽ';
+    conversions['ss'] = 'ß';
+    conversions['IJ'] = 'Ĳ';
+    conversions['ij'] = 'ĳ';
+    conversions['OE'] = 'Œ';
+    conversions['f'] = 'ƒ';
+
+    for(var i in conversions){
+    var re = new RegExp(conversions[i],"g");
+    if (i <= 2) {
+    }
+    str = str.replace(re,i);
+}
+
+return str;
+}
+
+// router.get('/user/eventful/search/:d', (req, res) => {
+//   let d = req.params.q
 //
+//   let options = {
+//     url: `http://eventful.com/rest/events?q=${d}`,
+//     headers: { 'Authorization': 'Bearer KNTLkbbm3QH6vhQf' },
+//     json: true
+//   }
+//
+//   request.get(options, (error, response, body) => {
+//     console.log(body)
+//   })
 // })
+
+router.get('/user/eventful/:q', (req, res) => {
+  let q = req.params.q.split(',')
+  let p = []
+  q.forEach((result) => {
+    result = convert_accented_characters(result)
+    p.push(result)
+  })
+  let events = []
+  let count = 0
+  p.forEach((artist) => {
+    console.log(artist)
+    new Promise ((resolve, reject) => {
+      client.searchEvents({keywords: artist, perfomers: artist ,location: 'France', page_size: 20, category: 'music'}, (err, data) => {
+        if (err) {
+          return console.log(err);
+        }
+        count++
+        if (data.search.events.event) {
+          if (data.search.events.event.length > 0) {
+            data.search.events.event = data.search.events.event.filter((event) => {
+              return event.title.toLowerCase().includes(artist.toLowerCase())
+            })
+            if (data.search.events.event.length > 0) {
+              events.push(data)
+            }
+          } else {
+            // console.log('only one event')
+            if (data.search.events.event.title.toLowerCase().includes(artist.toLowerCase())) {
+              events.push(data)
+            }
+          }
+        }
+          if (count === q.length) {
+            resolve(events)
+          }
+      })
+    }).then((data) => {
+      res.send({data})
+    })
+  })
+})
+
+router.get('/artist/eventful/:q', (req, res) => {
+  let artist = req.params.q
+  console.log(artist)
+
+  client.searchEvents({keywords: artist, witihin: 'title', page_size: 20, category: 'music'}, (err, data) => {
+    if (err) {
+      return console.log(err);
+    }
+    res.send({data})
+  })
+})
+
+
+router.get('/eventful/searchall', (req, res) => {
+  client.searchEvents({location: 'France', page_size: 50, category: 'music'}, (err, data) => {
+    if (err) {
+      return console.log(err)
+    }
+    res.send({data})
+  })
+})
+
+router.get('/event/eventful/:artist/:id', (req, res) => {
+  let artist = req.params.artist
+  let id = req.params.id
+  console.log(id)
+  // client.listCategories((err, data) => {
+  //   console.log(data)
+  // })
+  client.searchEvents({keywords: artist, page_size: 50}, (err, data) => {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(data.search.events.event)
+    if (data.search.events.event) {
+      data.search.events.event = data.search.events.event.filter((event) => {
+        return event.$.id == id
+      })
+    }
+    console.log(data.search.events.event[0])
+    res.send({data})
+  })
+})
+
 
 module.exports = router

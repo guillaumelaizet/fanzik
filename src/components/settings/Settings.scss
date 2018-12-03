@@ -1,0 +1,87 @@
+@import '../../style/variables.styl';
+
+.settings-bloc {
+
+  h1 {
+  }
+
+  .form {
+
+    width: 70%;
+    margin: 20px auto;
+    padding: 40px 40px 90px 40px;
+    background: #fff;
+
+    .avatar-bloc {
+
+      position: relative;
+
+      input {
+        position: fixed;
+        height: 90px;
+        opacity: 0;
+        display: none;
+      }
+
+      .avatar-img {
+
+        width: 100px;
+        height: 100px;
+        border-radius: 100px;
+        border: 3px solid $orange;
+      }
+    }
+
+    .form-group {
+
+      // width: 50%;
+      text-align: left;
+      .control-label {
+
+
+        .input-group {
+
+          .icon {
+
+            .form-control {
+
+
+            }
+          }
+        }
+      }
+
+
+      .form-control {
+
+      }
+
+    }
+
+    .change-password {
+
+      text-align: left;
+      padding-top: 20px;
+      font-size: 0.9em;
+      color: $orange;
+      cursor: default;
+      width: max-content;
+
+      &:hover {
+        color: $darkOrange
+      }
+    }
+    .btn-info {
+
+      background-color: $orange;
+      border: 1px solid transparent;
+      margin: 10px 0 20px 0;
+      cursor: default;
+
+      &:hover {
+        background: $darkOrange
+      }
+
+    }
+  }
+}

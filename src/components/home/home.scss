@@ -1,0 +1,141 @@
+.container {
+
+  .bg1 {
+      background-image: url('../../assets/music-background.jpg')
+  }
+
+  .bg2 {
+      background-image: url('../../assets/music-background2.jpg')
+  }
+
+  .bg3 {
+      background-image: url('../../assets/music-background.jpg')
+  }
+
+  .bg4 {
+      background-image: url('../../assets/music-background.jpg')
+  }
+
+  #image-background {
+
+  }
+  .landing-page-content {
+
+    width: 100%;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    margin: 0vh auto 2vh auto;
+    background-color: #0e1111;
+    opacity: 0.8;
+    color: white;
+    text-align: center;
+    padding: 10vh 5vh;
+    font-size: 1.8em;
+
+    .large-logo {
+
+      font-size: 2em;
+      margin-bottom: 5vh;
+
+    }
+
+    .btn-auth {
+
+      margin-bottom: 5vh;
+      display: flex;
+      justify-content: space-around;
+
+      .btn-link-login {
+
+      }
+
+      .btn-link-signin {
+
+      }
+    }
+
+
+  }
+
+  .landing-description {
+
+    opacity: 0.5;
+    font-size: 1.1em;
+    /* padding: 5vh 0; */
+    text-align: center;
+    width: 100%;
+    height: 150px;
+    display: flex;
+    background: lightgrey;
+    margin-bottom: 20px;
+
+    .text-info {
+
+      width: 35%;
+      margin: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+
+      .icon-info {
+
+        background: none !important;
+        color: inherit !important;
+        margin: auto;
+        min-width: 50px;
+        min-height: 50px;
+
+      }
+    }
+  }
+  .form {
+
+    .form-group {
+
+      .icon-auth {
+
+        padding: 10px;
+        background: #FFA500;
+        color: white;
+        min-width: 50px;
+        height: 40px;
+        text-align: center;
+
+      }
+
+      .form-control:focus {
+
+        border: 2px solid dodgerblue;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    .btn-login {
+
+      margin: 10px 0 10px 0;
+      background: #FFA500;
+      border: none;
+    }
+
+    .btn-primary {
+
+      background: #FFA500;
+      border: none;
+    }
+
+    .btn-success {
+
+      background: red;
+      border: none;
+    }
+
+  }
+
+
+  .btn-success-signin {
+    border: transparent;
+    background: #FFA500;
+  }
+}

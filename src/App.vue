@@ -3,67 +3,112 @@
     <div id="blur"></div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <!-- <img src="../assets/logo-music.png" alt="" width="60px" height="60px"> -->
-      <a class="navbar-brand" href="#" v-on:click="goHome()">Music Réseau Social</a>
+      <a class="navbar-brand" href="#">Music Réseau Social</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <div class="navbar-nav mr-auto">
-          <!-- <form class=" ml-0">
-            <input type="text" placeholder="search" id="search" [(ngModel)]="search" [ngModelOptions]="{standalone: true}">
-            <button type="submit" (click)="submitSearch($event)"></button>
-          </form> -->
       </div>
         <ul class="navbar-nav ml-auto">
           <a class="nav-link signin" v-if="token == null || undefined" v-on:click="login()">SignIn</a>
           <a class="nav-link badge-signup" v-if="token == null || undefined" v-on:click="register()"><div>SignUp</div></a>
           <!-- <a class="nav-link admin" v-if="!token">Admin</a> -->
-          <a class="nav-link accueil-nav" v-if="token" v-on:click="goToWallMe()"><span class="accueil">{{user.pseudo}}</span></a>
-          <a class="nav-link" v-if="token" v-on:click="goToPrivatemessage()">Message</a>
-          <a class="nav-link" v-if="token" v-on:click="goToEventsSearch()">Events</a>
+          <a class="nav-link settings-nav" v-on:click="goToSettings()" v-if="token"><font-awesome-icon class="icon icon-icon-cog" icon="cog"/></a>
+          <a class="nav-link" v-if="token" v-on:click="goToPrivatemessage()"><font-awesome-icon class="icon icon-icon-envelope" icon="envelope-open"/></a>
+          <a class="nav-link" v-if="token" v-on:click="goToEventsSearch()"><font-awesome-icon class="icon icon-icon-calendar" icon="calendar-alt" aria-hidden="true" title="events" alt="title"/></a>
           <!-- <a class="nav-link">Pseudo</a> -->
-          <a class="nav-link" v-on:click="logout()" v-if="token" style="cursor:pointer"><font-awesome-icon class="icon icon-logout" icon="sign-out-alt"/></a>
+          <a class="nav-link accueil-nav" v-if="token" v-on:click="goToWallMe()">
+            <span class="accueil">
+              <img class="nav-img" v-if="user.avatar !== undefined" :src="user.avatar"/>
+              <img class="nav-img" v-else src="./assets/anonyme.jpeg" alt="">
+            </span></a>
+          <a class="nav-link" v-on:click="logout()" v-if="token" style="cursor:pointer"><font-awesome-icon class="icon icon icon-logout" icon="sign-out-alt" title="title" alt="title"/></a>
         </ul>
       </div>
     </nav>
     <div class="render">
-      <router-view></router-view>
+      <router-view :me="user" :spoti="spoti"></router-view>
     </div>
+    <footer class="page-footer font-small bg-dark">
+
+      <!-- Copyright -->
+      <div class="footer-copyright text-center py-3 color-light ">© 2018 Copyright : Fanzik.org
+      </div>
+      <!-- Copyright -->
+
+    </footer>
+
   </div>
 </template>
 
 <script>
 import Service from './service/serviceReal.js'
 import EventBus from './event-bus.js'
-// import Vue from 'vue'
+import {globalData} from './globalData.js'
+// import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
   name: 'App',
+
+  // components: {
+  //   PulseLoader
+  // },
 
   data () {
     return {
       token: null,
       user: {},
-      search: {}
+      search: {},
+      spoti: null
     }
   },
 
   created: function () {
+    EventBus.$on('token expired', () => {
+      console.log('token expired')
+      Service.instance.fetchMe().then((response) => {
+        let refreshToken = response.refresh_token
+        Service.instance.refreshSpotifyToken(refreshToken).then((response) => {
+          Service.instance.saveNewToken(response.access_token).then((response) => {
+            this.user = response
+            globalData.setMeInfo(response)
+          })
+        })
+      })
+    })
     this.token = Service.instance.getToken()
     if (this.token) {
       Service.instance.fetchMe().then((response) => {
         this.user = response
-        console.log('user info ' + this.user)
+        let accessToken = response.access_token
+        let accessTokenValidity = response.access_token_validate_time
+        let now = new Date().getTime()
+        let tokenValidity = new Date(accessTokenValidity).getTime()
+        let diff = (now - tokenValidity) / 1000
+        if (diff >= 30) {
+          let refreshToken = response.refresh_token
+          Service.instance.refreshSpotifyToken(refreshToken).then((response) => {
+            Service.instance.saveNewToken(response.access_token).then((response) => {
+              this.user = response
+              console.log(globalData.me)
+              globalData.setMeInfo(response)
+            })
+          })
+        }
+
+        Service.instance.fetchSpotifyInfo(accessToken).then((response) => {
+          this.spoti = response.body
+          globalData.setSpotiMeInfo(response.body)
+        })
       })
     }
     EventBus.$on('isAuthenticate', () => {
-      console.log('checked isAuthenticate')
       this.token = Service.instance.getToken()
       if (this.token) {
         Service.instance.fetchMe().then((response) => {
           this.user = response
-          console.log('user info ' + this.user)
         })
       }
     })
@@ -71,7 +116,9 @@ export default {
     EventBus.$on('isLogout', () => {
       console.log('logout')
       this.token = Service.instance.getToken()
-      console.log(this.token)
+      const url = 'https://accounts.spotify.com/en/logout'
+      const spotifyLogoutWindow = window.open(url, 'Spotify Logout', 'width=700,height=500,top=40,left=40')
+      setTimeout(() => spotifyLogoutWindow.close(), 2000)
     })
   },
 
@@ -94,16 +141,20 @@ export default {
     },
 
     goToPrivatemessage () {
-      this.$router.push('/message')
+      this.$router.push('/messages')
     },
 
     goToEventsSearch () {
-      this.$router.push('events')
-      // this.$router.push('/events?access_token=' + window.localStorage.getItem('spotify_access_token'))
+      this.$router.push('/events')
     },
 
     goToWallMe () {
-      this.$router.push('home')
+      console.log(this.user)
+      this.$router.push('/home/' + this.user._id)
+    },
+
+    goToSettings () {
+      this.$router.push('/settings')
     }
   }
 
@@ -111,8 +162,10 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:700');
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -131,7 +184,7 @@ export default {
 }
 
 .navbar {
-  height: 80px;
+  /* height: 80px; */
 }
 
 .nav-link {
@@ -146,22 +199,49 @@ export default {
   border: 1px solid transparent;
   padding: 5px;
   border-radius: 5px;
-  background: red;
+  /* background: red; */
   margin: auto;
   color: #fff !important;
+}
+
+.badge-signup {
+  background: red;
+}
+
+.acceuil-nav {
+}
+
+.acceuil {
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+}
+
+.nav-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
 }
 
 .icon-logout {
   color: red !important;
 }
 
+.icon {
+
+  transform: scale(1.3, 1.3)
+}
 .render {
   /* opacity: 0; */
   position: relative;
   min-height: 90vh;
   margin: 0 auto;
   width: 80vw;
-  padding-top: 5vh;
+  padding: 5vh 0;
   z-index: 2;
+}
+
+.footer-copyright {
+  color: white;
 }
 </style>

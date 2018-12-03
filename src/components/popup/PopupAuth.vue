@@ -35,12 +35,6 @@ export default {
         this.close()
       }
     })
-
-    // Vue.transition('modal', {
-    //   afterLeave: function (el) {
-    //     Vue.nextTick(() => { this.onClose() })
-    //   }
-    // })
   },
 
   methods: {

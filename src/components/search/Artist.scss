@@ -1,0 +1,173 @@
+@import '../../style/variables.styl';
+
+.artist {
+  background: #fff;
+  border-radius: 20px;
+
+
+  .artist-info {
+
+    display: flex;
+    // margin:
+
+    .artist-image {
+
+      // width: 30%;
+      img {
+
+        width: 200px;
+        height: 200px;
+        border-radius: 20px;
+        margin: 10px;
+      }
+
+    }
+    .artist-description {
+
+      width: 70%;
+      // margin: 10px auto ;
+
+      .artist-sub-info {
+
+        margin: 10px;
+        .artist-title {
+
+          margin-bottom: 10px;
+
+          h3 {
+            color: $darkOrange;
+            text-align: left;
+          }
+        }
+
+        .artist-genres {
+
+          text-align: left;
+        }
+
+        .artist-followers {
+
+          text-align: left;
+        }
+      }
+    }
+  }
+
+  h1 {
+    color: $darkOrange;
+  }
+
+  .related-artist {
+
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    overflow-x: scroll;
+    margin: 10px auto;
+    border-radius: 10px;
+    background: #fff;
+    width: 90%;
+
+
+    &::-webkit-scrollbar {
+      width: 12px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: #eaeaea;
+      border-left: 1px solid #ccc;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: $orange;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background-color:$darkOrange;
+}
+
+    .related-artist-info {
+
+      width: 100px;
+      height: 100px;
+      position: relative;
+      margin: 5px;
+
+      .related-artist-image {
+        // width: 50px;
+        // height: 50px;
+
+        img {
+
+          width: 100px;
+          height: 100px;
+        }
+
+      }
+
+      .related-artist-name {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #fff;
+      }
+    }
+  }
+
+  .artist-events {
+    position: relative;
+    min-height: 300px;
+    padding: 20px 50px 50px 50px;
+
+    .form-group {
+      margin: 2vh auto 5vh auto;
+      width: 50%;
+    }
+    .list-events {
+
+      // margin: 20px 0;
+      // padding: 10px 0 0 0;
+      h1 {
+        color: #000;
+        width: 70%;
+        margin: 5px auto;
+        text-align: left;
+        font-size: 1.5em;
+
+        &:hover {
+          color: $orange
+        }
+      }
+
+      .events {
+
+        display: none;
+
+        .event {
+          display: flex;
+          justify-content: space-between;
+          width: 70%;
+          color: #000;
+          padding: 20px;
+          margin: 5px auto;
+          border: 2px solid $darkOrange;
+          border-radius: 5px;
+          text-align: left;
+
+          .icon {
+            margin: auto 0;
+            // width: 70%;
+            // text-align: right;
+            img {
+              width: 50px;
+              height: 50px;
+            }
+          }
+        }
+
+
+      }
+      .janvier {
+
+        display: initial
+      }
+    }
+  }
+}

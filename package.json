@@ -25,6 +25,7 @@
     "eventful-node": "^1.1.1",
     "express-session": "^1.15.6",
     "jsonwebtoken": "^8.3.0",
+    "moment": "^2.22.2",
     "mongoose": "^5.3.4",
     "node-sass": "^4.9.4",
     "nodemailer": "^4.6.8",
@@ -33,7 +34,8 @@
     "sass-loader": "^7.1.0",
     "vue": "^2.5.2",
     "vue-resource": "^1.5.1",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue-spinner": "^1.0.3"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

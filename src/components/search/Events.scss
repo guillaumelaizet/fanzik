@@ -1,0 +1,220 @@
+@import '../../style/variables.styl';
+
+.wrapper {
+
+  background: white;
+  border-radius: 10px;
+  padding: 40px;
+  // margin-bottom: 50px;
+
+  .nav {
+
+    .nav-item {
+      color: red;
+
+      &:active {
+        background: red !important;
+        color: white !important;
+      }
+    }
+
+
+  }
+
+  .tab-content {
+
+    #p1 {
+
+      .search-events {
+
+        margin-top: 40px;
+
+        .form {
+
+          .form-group {
+
+            .input-group {
+
+              #search {
+
+                max-width: 50%;
+
+              }
+            }
+
+          }
+
+        }
+
+        h2 {
+          margin: 50px auto 10px auto;
+        }
+
+        .search-events-spoti {
+
+          .artists-list {
+
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+
+            .artist {
+
+              margin: 40px 20px;
+              width: 200px;
+              height: 200px;
+              position: relative;
+
+              .images {
+
+                .artist-image {
+
+                  border-radius: 10px;
+                  width: 200px;
+                  height: 200px;
+
+                }
+
+              }
+
+              .artist-info {
+
+                position: absolute;
+                top: 80%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 1.2em
+
+              }
+
+            }
+          }
+        }
+
+        .search-no-spoti {
+
+          .events-list {
+
+            .event {
+              display: flex;
+              flex-direction: column;
+              border: 2px solid $orange;
+              border-radius: 10px;
+              width: 70%;
+              margin: 10px auto;
+              // padding: 10px;
+
+              .title {
+                padding: 10px;
+                text-align: left;
+                background: $orange;
+              }
+
+              .info-bloc {
+
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                .info {
+
+                  text-align: left;
+                }
+
+                .date {
+
+                  text-align: left;
+                }
+              }
+            }
+          }
+
+        }
+
+      }
+
+      .no-events {
+
+        margin: 40px auto 20px auto;
+      }
+
+    }
+
+    #p3 {
+
+      .tab-content {
+
+        #interested {
+
+          .event {
+            display: flex;
+            flex-direction: column;
+            border: 2px solid $orange;
+            border-radius: 10px;
+            width: 70%;
+            margin: 10px auto;
+            // padding: 10px;
+
+            .title {
+              padding: 10px;
+              text-align: left;
+              background: $orange;
+            }
+
+            .info-bloc {
+
+              display: flex;
+              justify-content: space-between;
+              padding: 10px;
+              .info {
+
+                text-align: left;
+              }
+
+              .date {
+
+                text-align: left;
+              }
+            }
+          }
+        }
+
+        #participate {
+
+          .event {
+            display: flex;
+            flex-direction: column;
+            border: 2px solid $orange;
+            border-radius: 10px;
+            width: 70%;
+            margin: 10px auto;
+            // padding: 10px;
+
+            .title {
+              padding: 10px;
+              text-align: left;
+              background: $orange;
+            }
+
+            .info-bloc {
+
+              display: flex;
+              justify-content: space-between;
+              padding: 10px;
+              .info {
+
+                text-align: left;
+              }
+
+              .date {
+
+                text-align: left;
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+}

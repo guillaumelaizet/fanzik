@@ -3,20 +3,33 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const eventSchema = new Schema({
-  id: String,
+  idEvent: String,
   title: String,
-  artist: String,
+  artists: [
+    {
+      name: String
+    }
+  ],
   musicType: [String],
   description: String,
-  participantUsers: [Schema.Types.ObjectId],
+  participantUsers: [
+    {
+      id: Schema.Types.ObjectId,
+      date: {type: Date, default: Date.now}
+    }
+  ],
   comments: [],
-  location: {
-    street: String,
-    zipCode: Number,
-    city: String
-  },
+  venue_name: String,
+  city_name: String,
+  country_name: String,
   link: String,
-  date: { type: Date, default: Date.now }
+  date: String,
+  interestedUsers: [
+    {
+      id: Schema.Types.ObjectId,
+      date: {type: Date, default: Date.now}
+    }
+  ]
 })
 
 module.exports = mongoose.model('event', eventSchema, 'events')

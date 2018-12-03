@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
-const eventSchema = new Schema({
+const messageSchema = new Schema({
   id: String,
   eventCreator: Object,
   eventReceiver: Object,
@@ -15,4 +15,4 @@ const eventSchema = new Schema({
   date: { type: Date, default: Date.now }
 })
 
-module.exports = mongoose.model('event', eventSchema, 'events')
+module.exports = mongoose.model('message', messageSchema, 'messages')

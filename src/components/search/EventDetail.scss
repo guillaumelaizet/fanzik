@@ -1,0 +1,96 @@
+@import '../../style/variables.styl';
+
+.go-back {
+
+  text-align: left;
+  margin-bottom: 50px;
+  .btn {
+    background: $darkOrange
+  }
+}
+
+.event {
+  margin: auto;
+  border: 1px solid $orange;
+  border-radius: 20px;
+  background: #fff;
+  width: 80%;
+
+  .event-title {
+
+    margin: 10px 0;
+  }
+
+  .event-description {
+
+    text-align: left;
+    margin: 20px;
+  }
+
+  .event-choice {
+
+    display: flex;
+    justify-content: center;
+    margin: 0 0 20px 0;
+    .follow-event {
+
+      .btn {
+        background: transparent;
+        border: 2px solid $orange;
+        width: 220px;
+
+        &:hover {
+          border: 2px solid $darkOrange;
+        }
+      }
+
+      .followed {
+        border: 2px solid transparent;
+        background: $orange;
+
+        &:hover {
+          border: 2px solid $darkOrange
+        }
+      }
+
+    @media screen and (max-width: $small) {
+      margin-bottom: 10px;
+    }
+
+    }
+
+    .participate-event {
+
+      margin-left: 10px;
+      .btn {
+        background: transparent;
+        border: 2px solid $orange;
+        width: 220px;
+
+        &:hover {
+          border: 2px solid $darkOrange
+        }
+
+      }
+      .participated {
+        border: 2px solid transparent;
+        background: $orange;
+
+        &:hover {
+          border: 2px solid $darkOrange;
+        }
+      }
+
+      @media screen and (max-width: $small) {
+        margin-left: 0;
+      }
+    }
+
+    @media screen and (max-width: $small) {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+
+}
