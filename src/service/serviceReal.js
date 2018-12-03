@@ -4,6 +4,9 @@ import countries from './countries.json'
 
 let singleInstance
 
+let path = 'http://www.fanzik.org/'
+// let path 'http://localhost:3000/'
+
 class Service {
   constructor () {
     singleInstance = this
@@ -79,7 +82,7 @@ class Service {
   // --------------------------------------------------------- Auth -------------------------------------------------------
 
   register (userData) {
-    const url = 'http://www.fanzik.org/api/register'
+    const url = path + 'api/register'
     let params = {
       pseudo: userData.pseudo,
       email: userData.email,
@@ -98,7 +101,7 @@ class Service {
   }
 
   login (userData) {
-    const url = 'http://www.fanzik.org/api/login'
+    const url = path +  'api/login'
     let params = {
       pseudo: userData.pseudo,
       password: userData.password
@@ -124,7 +127,7 @@ class Service {
 
   fetchMe () {
     console.log('enter fetchMe')
-    const url = 'http://localhost:3000/api/user/me'
+    const url = path + 'api/user/me'
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         let user = response.data
@@ -134,7 +137,7 @@ class Service {
   }
 
   fetchUser (id) {
-    const url = `http://localhost:3000/api/user/${id}`
+    const url = `${path}api/user/${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         let user = response.data
@@ -144,7 +147,7 @@ class Service {
   }
 
   fetchUsers (ids) {
-    const url = `http://localhost:3000/api/users/${ids}`
+    const url = `${path}api/users/${ids}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         let user = response.data
@@ -154,7 +157,7 @@ class Service {
   }
 
   fetchAllUsers () {
-    const url = 'http://localhost:3000/api/allusers'
+    const url = path + 'api/allusers'
     console.log('ok from Service')
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((users) => {
@@ -176,7 +179,7 @@ class Service {
       ids.push(friend._id)
     })
     console.log(ids)
-    const url = `http://localhost:3000/api/post/fetch/${id}/${ids}`
+    const url = `${path}api/post/fetch/${id}/${ids}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response.body)
@@ -189,7 +192,7 @@ class Service {
 
   createPost (post) {
     console.log(post)
-    const url = 'http://localhost:3000/api/post/create'
+    const url = path + 'api/post/create'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, post).then((response) => {
@@ -202,7 +205,7 @@ class Service {
   }
 
   commentPost (post) {
-    const url = 'http://localhost:3000/api/post/comment/create'
+    const url = path + 'api/post/comment/create'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, post).then((response) => {
@@ -217,7 +220,7 @@ class Service {
   // ---------------------------------------------------------- Event -----------------------------------------------------
 
   fetchExistingEvent (id) {
-    const url = `http://localhost:3000/api/event/fetch/${id}`
+    const url = `${path}api/event/fetch/${id}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -231,7 +234,7 @@ class Service {
 
   fetchFavorite (id) {
     // console.log('id ' + id)
-    const url = `http://localhost:3000/api/events/favorite/${id}`
+    const url = `${parh}api/events/favorite/${id}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -245,7 +248,7 @@ class Service {
   }
 
   eventCreation (event) {
-    const url = 'http://localhost:3000/api/event/create'
+    const url = path + 'api/event/create'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, event).then((response) => {
@@ -260,7 +263,7 @@ class Service {
 
   followEvent (event) {
     console.log(event)
-    const url = 'http://localhost:3000/api/event/follow'
+    const url = path + 'api/event/follow'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, event).then((response) => {
@@ -274,7 +277,7 @@ class Service {
 
   unFollowEvent (event) {
     console.log(event)
-    const url = 'http://localhost:3000/api/event/unfollow'
+    const url = path + 'api/event/unfollow'
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, event).then((response) => {
         resolve(response.body)
@@ -286,7 +289,7 @@ class Service {
   }
 
   participateEvent (event) {
-    const url = 'http://localhost:3000/api/event/participate'
+    const url = path + 'api/event/participate'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, event).then((response) => {
@@ -299,7 +302,7 @@ class Service {
   }
 
   unParticipateEvent (event) {
-    const url = 'http://localhost:3000/api/event/unparticipate'
+    const url = path + 'api/event/unparticipate'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, event).then((response) => {
@@ -327,7 +330,7 @@ class Service {
     q = q.slice(0, 9)
     // let d = 'kalkbrenner'
     // const url = `http://localhost:3000/api/user/eventful/search/${d}`
-    const url = `http://localhost:3000/api/user/eventful/${q}`
+    const url = `${path}api/user/eventful/${q}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         if (JSON.stringify(response.body.data) !== '[]') {
@@ -346,7 +349,7 @@ class Service {
   fetchMusic (artist) {
     let q = artist
 
-    const url = `http://localhost:3000/api/artist/eventful/${q}`
+    const url = `${path}api/artist/eventful/${q}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -366,7 +369,7 @@ class Service {
 
   fetchEvent (artist, id) {
     console.log('fetchEvent')
-    const url = `http://localhost:3000/api/event/eventful/${artist}/${id}`
+    const url = `${path}}api/event/eventful/${artist}/${id}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -381,7 +384,7 @@ class Service {
   }
 
   fetchEventsFromLocation () {
-    const url = 'http://localhost:3000/api/eventful/searchall'
+    const url = path + 'api/eventful/searchall'
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -401,7 +404,7 @@ class Service {
 
   spotifyAuthentication () {
     Vue.http.options.xhr = {withCredentials: true}
-    const url = 'http://localhost:3000/api/spotify/login'
+    const url = path + 'api/spotify/login'
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response.data)
@@ -413,7 +416,7 @@ class Service {
   }
 
   receiveSpotifyCredentials (code, state) {
-    const url = `http://localhost:3000/api/callback?code=${code}&state=${state}`
+    const url = `${path}api/callback?code=${code}&state=${state}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         console.log(response.data)
@@ -427,7 +430,7 @@ class Service {
 
   refreshSpotifyToken (token) {
     console.log('refresh from service')
-    const url = `http://localhost:3000/api/refresh_token/${token}`
+    const url = `${path}api/refresh_token/${token}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response.data)
@@ -442,7 +445,7 @@ class Service {
     let accessToken = tokens.access_token
     let refreshToken = tokens.refresh_token
     let avatar = {avatar: tokens.avatar}
-    const url = `http://localhost:3000/api/user/tokens/${accessToken}/${refreshToken}`
+    const url = `${path}api/user/tokens/${accessToken}/${refreshToken}`
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, avatar).then((response) => {
         resolve(response.data)
@@ -454,7 +457,7 @@ class Service {
   }
 
   saveNewToken (token) {
-    const url = `http://localhost:3000/api/user/newtoken/${token}`
+    const url = path + `api/user/newtoken/${token}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url).then((response) => {
@@ -464,7 +467,7 @@ class Service {
   }
 
   fetChAccessTokenValidity () {
-    const url = 'http://localhost:3000/api/user/access_token/isvalidate'
+    const url = path + 'api/user/access_token/isvalidate'
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response.data)
@@ -478,7 +481,7 @@ class Service {
   // ------------------------------------------------------------ Data --------------------------------------------------------------
 
   fetchSpotifyInfo (token) {
-    const url = `http://localhost:3000/api/user/spotify/me/${token}`
+    const url = `${path}api/user/spotify/me/${token}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response)
@@ -490,7 +493,7 @@ class Service {
   }
 
   fetchArtists (token, q) {
-    const url = `http://localhost:3000/api/user/spotify/artists/${token}/${q}`
+    const url = `${path}api/user/spotify/artists/${token}/${q}`
     console.log(url)
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -503,7 +506,7 @@ class Service {
   }
 
   fetchArtist (token, q) {
-    const url = `http://localhost:3000/api/user/spotify/artist/${token}/${q}`
+    const url = `${path}api/user/spotify/artist/${token}/${q}`
     console.log(url)
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -516,7 +519,7 @@ class Service {
   }
 
   fetchArtistByName (token, q) {
-    const url = `http://localhost:3000/api/user/spotify/artist/byname/${token}/${q}`
+    const url = `${path}api/user/spotify/artist/byname/${token}/${q}`
     console.log(url)
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -529,7 +532,7 @@ class Service {
   }
 
   fetchRelatedArtists (token, id) {
-    const url = `http://localhost:3000/api/spotify/artist/relatedartists/${token}/${id}`
+    const url = `${path}api/spotify/artist/relatedartists/${token}/${id}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -542,7 +545,7 @@ class Service {
   }
 
   fetchUserPlaylist (token) {
-    const url = `http://localhost:3000/api/user/spotify/playlist/${token}`
+    const url = `${path}api/user/spotify/playlist/${token}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response.data)
@@ -555,7 +558,7 @@ class Service {
 
   fetchUserWollowing (token) {
     console.log('entering following')
-    const url = `http://localhost:3000/api/user/spotify/following/${token}`
+    const url = `${path}api/user/spotify/following/${token}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         resolve(response.data)
@@ -564,7 +567,7 @@ class Service {
   }
 
   fetchUserTopArtists (token) {
-    const url = `http://localhost:3000/api/user/spotify/top/${token}`
+    const url = `${path}api/user/spotify/top/${token}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         console.log(response.data)
@@ -580,7 +583,7 @@ class Service {
       asking: asking,
       receiving: receiving
     }
-    const url = 'http://localhost:3000/api/friend/invite'
+    const url = path + 'api/friend/invite'
     return new Promise((resolve, reject) => {
       return Vue.http.put(url, data).then((response) => {
         resolve(response.body)
@@ -592,7 +595,7 @@ class Service {
   }
 
   fetchFriends (id) {
-    const url = `http://localhost:3000/api/friends/${id}`
+    const url = `${path}api/friends/${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         console.log(response)
@@ -605,7 +608,7 @@ class Service {
   }
 
   fetchPending (id) {
-    const url = `http://localhost:3000/api/friend/pending/${id}`
+    const url = `${path}api/friend/pending/${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
         console.log(response)

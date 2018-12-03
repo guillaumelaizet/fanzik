@@ -33,7 +33,6 @@ router.use(cors())
 
 mongoose.connect(url, { useNewUrlParser: true }, (err) => {
   if (err) {
-    // console.log('err');
     console.log('error : ' + err.stack)
     process.exit(1)
   } else {
@@ -42,7 +41,6 @@ mongoose.connect(url, { useNewUrlParser: true }, (err) => {
 });
 
 function verifyToken(req, res, next) {
-  // console.log('Bearer from verifyToken ' + req.headers.authorization)
   if (!req.headers.authorization) {
     console.log('no bearer')
     return res.status(401).send('Unauthorized request')
@@ -63,37 +61,12 @@ function verifyToken(req, res, next) {
   next()
 }
 
-// when a user leave the application without loggout, and come back, the user is redirect to his profile directly i token exists
-// router.get('/home', (req, res) => {
-  // console.log(req.headers.authorization)
-  // let token = req.headers.authorization.split(' ')[1]
-  // console.log('token  ' + token)
-//   if (token == 'null') {
-//     res.status(401).send('Unauthorized')
-//   } else {
-//     let payload = jwt.verify(token, 'secretKey')
-//     if (!payload) {
-//       res.status(401).send('Unauthorized')
-//     }
-//     User.findOne({_id: payload.subject}, (err, data) => {
-//       if (err) {
-//         console.log('error')
-//         res.send(err)
-//       } else {
-//         console.log('ok from api')
-//         res.send(data)
-//       }
-//     })
-//   }
-// })
 
 
 // -------------------------------------------------------------------- Auths ----------------------------------------------------------
 
 
 router.get('/verifyifduplicate/:data1/:data2', (req, res) => {
-  // console.log(req.params.data1)
-  // console.log(req.params.data2);
   User.findOne({pseudo: req.params.data1}, (err, user1) => {
     if (err) {
       console.log(err);
