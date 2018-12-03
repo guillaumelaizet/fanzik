@@ -954,7 +954,7 @@ router.get('/spotify/login',  function(req, res) {
       response_type: 'code',
       client_id: client_id,
       scope: scope,
-      redirect_uri: redirect_uri + '/5c0516cd7932d70016795f87',
+      redirect_uri: redirect_uri,
       state: state,
       show_dialog: true
     })
@@ -1016,7 +1016,7 @@ router.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
           data = body
-          let url = 'www.fanzik.org/home?auth=accept'
+          let url = 'www.fanzik.org/home/5c0516cd7932d70016795f87?auth=accept'
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
           //     access_token: access_token,
