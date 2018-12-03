@@ -22,6 +22,7 @@ app.use('/api', api)
 
 app.use(serveStatic(path.join(__dirname, 'dist')))
 
+console.log(process.env.PORT)
 
 const PORT = process.env.PORT || 3000
 
