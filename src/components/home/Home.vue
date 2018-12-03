@@ -180,7 +180,7 @@ export default {
     goToProfile () {
       this.$refs.popupSuccessRegister.close()
       EventBus.$emit('isAuthenticate')
-      this.$router.push({path: 'home/', query: { id: user._id}})
+      this.$router.push({path: 'home/', query: { id: this.user._id}})
     }
   }
 

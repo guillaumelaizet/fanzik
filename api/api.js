@@ -944,7 +944,7 @@ router.use((req, res, next) => {
 router.get('/spotify/login',  function(req, res) {
   console.log('enter setting cookie')
   console.log(req.cookies)
-  // res.header['set-cookie'] = state
+  let state = req.cookies.spotify_auth_state
   // console.log('cookie ' + res.header['set-cookie'])
   // res.cookie(stateKey, state, { expires  : new Date(Date.now() + 9999999), domain: 'http://localhost:8080', httpOnly: false });
   // console.log(res.cookie(stateKey))
