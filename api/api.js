@@ -954,7 +954,7 @@ router.get('/spotify/login',  function(req, res) {
       response_type: 'code',
       client_id: client_id,
       scope: scope,
-      redirect_uri: redirect_uri,
+      redirect_uri: redirect_uri + '/5c0516cd7932d70016795f87',
       state: state,
       show_dialog: true
     })
