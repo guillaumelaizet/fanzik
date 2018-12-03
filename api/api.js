@@ -1019,7 +1019,7 @@ router.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
           data = body
           console.log(data)
-          let url = `www.fanzik.org/home?id=${id}&auth=accept`
+          let url = `http://www.fanzik.org/home?id=${id}`
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
           //     access_token: access_token,
