@@ -179,5 +179,5 @@ export default {
 }
 </script>
 
-<style src="./artist.scss" lang="scss">
+<style src="./Artist.scss" lang="scss">
 </style>
