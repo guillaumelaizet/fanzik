@@ -249,6 +249,7 @@ export default {
 
     buildScreen () {
       let id = route.history.current.params.id
+      console.log(route.history.current.query.code)
       if (route.history.current.query.code !== undefined) {
         console.log('go receive credentials')
         this.receiveSpotifyCredentials()

@@ -970,8 +970,6 @@ router.get('/spotify/login',  function(req, res) {
 });
 
 router.get('/callback', function(req, res) {
-  // your application requests refresh and access tokens
-  // after checking the state parameter
   console.log('entering callback')
   console.log(req.cookies)
   var code = req.query.code || null;
@@ -1016,7 +1014,7 @@ router.get('/callback', function(req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
           data = body
-          let url = 'www.fanzik.org/home/5c0516cd7932d70016795f87?auth=accept'
+          let url = 'www.fanzik.org/home?auth=accept'
           // let url = 'http://localhost:8080/home?' +
           //   querystring.stringify({
           //     access_token: access_token,
