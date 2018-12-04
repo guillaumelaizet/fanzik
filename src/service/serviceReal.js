@@ -81,6 +81,21 @@ class Service {
 
   // --------------------------------------------------------- Auth -------------------------------------------------------
 
+  verifyifduplicate (pseudo, email) {
+    const url = `${path}api/verifyifduplicate/${pseudo}/${email}`
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        let user = response.data
+        resolve(user)
+      },
+      (error) => {
+        console.log(error)
+        resolve(error)
+      })
+    })
+
+  }
+
   register (userData) {
     const url = path + 'api/register'
     let params = {

@@ -44,7 +44,6 @@
               <input name="password" type="password" class="form-control rounded-0" required placeholder="password" v-model="userLoginData.password">
             </div>
           </div>
-          <span>mot de passe oublié ?</span>
           <button v-on:click="login(userLoginData)" type="button" class="btn btn-success float-right btn-login">login</button>
         </form>
       </div>
@@ -57,30 +56,42 @@
       <div class="" slot="body">
         <form class="form" role="form">
           <div class="form-group">
-            <label class="control-label" for="">Pseudo*</label>
+            <label class="control-label" for="">Pseudo</label>
             <div class="input-group">
               <font-awesome-icon class="icon-auth" icon="user"/>
               <input id="pseudo" name="pseudo" type="text" class="form-control rounded-0" v-model="userSignInData.pseudo">
             </div>
+            <div id="pseudo-taken" style="color:red; display: none">
+              ce pseudo est déjà pris
+            </div>
           </div>
           <div class="form-group">
-            <label for="">Email*</label>
+            <label for="">Email</label>
             <div class="input-group">
               <font-awesome-icon class="icon-auth" icon="envelope-open"/>
               <input id="email" name="email" type="text" class="form-control rounded-0" v-model="userSignInData.email">
             </div>
+            <div id="error-email" style="color:red; display: none">
+              Merci de renseigner un format valide
+            </div>
+            <div id="email-taken" style="color:red; display: none">
+              cet email correspond déja a un compte
+            </div>
           </div>
           <div class="form-group">
-            <label for="">mot de passe*</label>
+            <label for="">mot de passe</label>
             <div class="input-group">
               <font-awesome-icon class="icon-auth" icon="lock"/>
               <input id="password" name="password" type="password" class="form-control rounded-0" title="votre mot de passe doit contenir au moins 8 caractères" v-model="userSignInData.password">
+            </div>
+            <div id="error-password" style="color: red; display:none">
+
             </div>
           </div>
           <div class="form-group">
             <label for="country">Pays</label>
             <select class="form-control" v-model="userSignInData.country">
-              <option value="France" v-for="country in countries" :key="country.code">{{country.name}}</option>
+              <option value="France" v-for="country in countries":value="country.name" :key="country.code">{{country.name}}</option>
             </select>
           </div>
           <button v-on:click="signIn(userSignInData)" type="button" class="btn btn-primary float-right btn-signin">SignIn</button>
@@ -91,9 +102,9 @@
     <popup ref="popupSuccessRegister">
       <div slot="body">
         <div class="headline-blue">
-          <div class="h-aligner" slot="header" style="font-size: 18px; font-weight: bold; margin-top: 20px;">Félicitation ton inscritpion est fini</div>
+          <div class="h-aligner" slot="header" style="font-size: 18px; font-weight: bold; margin-top: 20px;">Félicitation <strong>Fanziker</strong> ton inscritpion est fini</div>
           <div style="margin-top: 20px; padding-bottom: 5px; font-size: 14px;">
-            Tu sera redirigé en cliquant sur le petit bouton :-)
+            Tu sera redirigé en cliquant sur le petit bouton
           </div>
         </div>
         <div class="modal-button noselect" style="width: 200px; margin: auto; font-size: 12pt; border: none" v-on:click="goToProfile($event)">
@@ -167,13 +178,34 @@ export default {
     },
 
     signIn (userData) {
-      Service.instance.register(userData).then((response) => {
-        this.$refs.popupRegister.close()
-        this.user = response.body.registeredUser
-        console.log(response.body.registeredUser)
-        this.$refs.popupSuccessRegister.show = true
-        Service.instance.storeId(response.body.registeredUser._id)
-        Service.instance.storeSessionId(response.body.token)
+      document.getElementById('pseudo-taken').style.display = 'none'
+      document.getElementById('error-email').style.display = 'none'
+      document.getElementById('email-taken').style.display = 'none'
+      var email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+      if (!email_regex.test(userData.email)) {
+        document.getElementById('email-taken').style.display = 'none'
+        document.getElementById('error-email').style.display = 'initial'
+      } else {
+        document.getElementById('error-email').style.display = 'none'
+      }
+
+      Service.instance.verifyifduplicate(userData.pseudo, userData.email).then((response) => {
+        if (response !== null) {
+          if (response.body == 'pseudo') {
+            document.getElementById('pseudo-taken').style.display = 'initial'
+          } else if (response.body === 'email') {
+            document.getElementById('email-taken').style.display = 'initial'
+          }
+        } else {
+          Service.instance.register(userData).then((response) => {
+            this.$refs.popupRegister.close()
+            this.user = response.body.registeredUser
+            console.log(response.body.registeredUser)
+            this.$refs.popupSuccessRegister.show = true
+            Service.instance.storeId(response.body.registeredUser._id)
+            Service.instance.storeSessionId(response.body.token)
+          })
+        }
       })
     },
 

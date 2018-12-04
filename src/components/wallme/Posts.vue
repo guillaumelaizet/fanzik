@@ -55,7 +55,7 @@
             </div>
             <div v-if="favoriteFromUsers" class="favorite-event-user">
               <div class="creator">
-                <div class="avatar">
+                <div class="avatar" v-on:click="goToUserWall(interestedfriends[0]._id)">
                   <img v-if="interestedfriends[0].avatar" :src="interestedfriends[0].avatar" alt="">
                   <img v-else src="../../assets/anonyme.jpeg" alt="">
                 </div>
@@ -73,7 +73,7 @@
             </div>
             <div v-if="participateFromUsers" class="participate-event-user">
               <div class="creator">
-                <div class="avatar">
+                <div  v-on:click="goToUserWall(interestedfriends[0]._id)" class="avatar">
                   <img v-if="particpateFriends[0].avatar" :src="particpateFriends[0].avatar" alt="">
                   <img v-else src="../../assets/anonyme.jpeg" alt="">
                 </div>
@@ -91,7 +91,7 @@
           <div v-if="evt.creatorId"class="post">
             <div v-if="evt.receiverId && evt.receiverId === me._id" class="post">
               <div class="bloc-user">
-                <div class="avatar">
+                <div  v-on:click="goToUserWall(creator._id)" class="avatar">
                   <img v-if="creator.avatar" :src="creator.avatar" alt="">
                   <img v-else src="../../assets/anonyme.jpeg" alt="">
                 </div>
@@ -105,7 +105,7 @@
             </div>
             <div v-if="evt.creatorId === me._id && evt.receiverId === currentUser._id "class="post">
               <div class="bloc-user">
-                <div class="avatar">
+                <div  v-on:click="goToUserWall(creator._id)" class="avatar">
                   <img v-if="creator.avatar" :src="creator.avatar" alt="">
                   <img v-else src="../../assets/anonyme.jpeg" alt="">
                 </div>
@@ -119,7 +119,7 @@
             </div>
             <div v-if="evt.creatorId === currentUser._id && !evt.receiverId" class="post">
               <div class="bloc-user">
-                <div class="avatar">
+                <div v-on:click="goToUserWall(creator._id)" class="avatar">
                   <img v-if="creator.avatar" :src="creator.avatar" alt="">
                   <img v-else src="../../assets/anonyme.jpeg" alt="">
                 </div>
@@ -134,7 +134,7 @@
             <div v-if="evt.creatorId === currentUser._id && evt.receiverId && evt.receiverId !== me._id "class="post">
               <div class="bloc-user">
                 <div class="avatar">
-                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-on:click="goToUserWall(creator._id)" v-if="creator.avatar" :src="creator.avatar" alt="">
                   <img v-else src="../../assets/anonyme.jpeg" alt="">
                 </div>
                 <div class="info">
@@ -207,7 +207,7 @@
       <div v-if="evt.comments.length > 0" class="list-comments">
         <div class="" v-for="comment in evt.comments" :key="comment._id">
           <div class="comment">
-            <div class="avatar">
+            <div v-on:click="goToUserWall(comment.id)" class="avatar">
               <img v-if="comment.avatar" :src="comment.avatar" alt="">
               <img v-else src="../../assets/anonyme.jpeg" alt="">
               <p>{{comment.pseudo}}</p>
