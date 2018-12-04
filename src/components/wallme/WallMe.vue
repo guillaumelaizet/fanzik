@@ -418,7 +418,7 @@ export default {
           creatorId: this.userMe._id,
           post: document.getElementById('search').value
         }
-        if (this.useMe._id !== this.currentUser._id) {
+        if (this.userMe._id !== this.currentUser._id) {
           post.receiverId = this.currentUser._id
         }
 
