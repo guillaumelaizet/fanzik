@@ -11,8 +11,10 @@
         </div>
       </div>
       <div class="choice">
-        <button v-on:click="acceptFriendship()" type="button" name="button" class="btn btn-primary">Accepter</button>
-        <button v-on:click="refuseFriendship()" type="button" name="button" class="btn btn-secondary btn-refuse">Refuser</button>
+        <button v-if="!accepted" v-on:click="acceptFriendship()" type="button" name="button" class="btn btn-primary">Accepter</button>
+        <button v-if="!accepted" v-on:click="refuseFriendship()" type="button" name="button" class="btn btn-secondary btn-refuse">Refuser</button>
+        <button v-if="accepted" type="button" name="button" class="btn "disabled>demande accepté</button>
+        <button v-if="notAccepted" type="button" name="button" class="btn btn-danger" disabled>demande refusé</button>
       </div>
     </div>
   </div>
@@ -20,6 +22,7 @@
 
 <script>
 import Service from '../../service/serviceReal'
+import EventBus from '../../event-bus.js'
 export default {
   name: 'request',
 
@@ -38,7 +41,15 @@ export default {
     return {
       id: this.requestId,
       user: {},
-      me: this.userMe
+      me: this.userMe,
+      accepted: false,
+      notAccepted: false
+    }
+  },
+
+  computed: {
+    accepted () {
+      return this.user.friends.filter(friend => friend.id === this.me._id && friend.status === 'confirmed').length > 0
     }
   },
 
@@ -59,13 +70,17 @@ export default {
       }
 
       Service.instance.acceptFriendship(userId1, userId2).then((user) => {
-        console.log(user)
+        this.accepted = true
+        this.user = user.userId1
+        // EventBus.$emit('acceptFriendShip', user.userId1)
+
       })
     },
 
     refuseFriendship () {
       Service.instance.declineFriendship(this.user._id, this.me._id).then((user) => {
-        console.log(user)
+        this.user = user.userId1
+        this.notAccepted = true
       })
     }
   }

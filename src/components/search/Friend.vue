@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="choice">
-        <button type="button" name="button" class="btn btn-primary">Lui écrire un message</button>
+        <button v-on:click="SendMessage()" type="button" name="button" class="btn btn-primary">Lui écrire un message</button>
       </div>
     </div>
   </div>
@@ -44,6 +44,12 @@ export default {
       console.log(user)
       this.friend = user
     })
+  },
+
+  methods: {
+    SendMessage () {
+      this.$router.push('/messages?q=write')
+    }
   }
 
 }

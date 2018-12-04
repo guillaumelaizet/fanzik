@@ -55,6 +55,7 @@
 // import Friend from './Friend'
 import Service from '../../service/serviceReal.js'
 import Message from './Message'
+import route from '../../router/index.js'
 
 export default {
   name: 'messages',
@@ -90,6 +91,7 @@ export default {
 
 
   created: function () {
+
     Service.instance.fetchMe().then((user) => {
       this.userMe = user
       this.friends = this.userMe.friends.filter((user) => {
@@ -110,6 +112,17 @@ export default {
         })
       })
     })
+  },
+
+  mounted: function () {
+    if (route.history.current.query.q === 'write') {
+      console.log('write')
+      document.getElementById('write').classList.add('active')
+      document.getElementById('write').classList.add('show')
+      document.getElementById('messages').classList.remove('active')
+      document.getElementById('messages').classList.remove('show')
+    }
+
   },
 
   methods: {

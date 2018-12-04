@@ -418,8 +418,8 @@ export default {
           creatorId: this.userMe._id,
           post: document.getElementById('search').value
         }
-        if (this.useMe._id !== this.currentUser.id) {
-          post.receiverId = this.currentUser.id
+        if (this.useMe._id !== this.currentUser._id) {
+          post.receiverId = this.currentUser._id
         }
 
         Service.instance.createPostOnFriendWall(post).then((response) => {
