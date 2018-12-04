@@ -416,8 +416,10 @@ export default {
       } else {
         let post = {
           creatorId: this.userMe._id,
-          receiverId: this.currentUser._id,
           post: document.getElementById('search').value
+        }
+        if (this.useMe._id !== this.currentUser.id) {
+          post.receiverId = this.currentUser.id
         }
 
         Service.instance.createPostOnFriendWall(post).then((response) => {
