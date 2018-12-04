@@ -159,22 +159,7 @@ router.post('/register', (req, res, next) => {
                         console.log('Message sent: %s', info.messageId)
                         console.log('preview URL: %s',nodemailer.getTestMessageUrl(info))
                       })
-                      console.log(registeredUser._id)
-                      User.findByIdAndUpdate(registeredUser._id, {$push: {friends : {id: adminId, status: 'confirmed'}}}, {new: true}, (err, registeredUser) => {
-                        if (err) {
-                          return console.log(err)
-                        } if (user) {
-                          console.log(user)
-                          User.findByIdAndUpdate(adminId, {$push : {friends : {id: registeredUser._id, status: 'confirmed'}}},  {new : true}, (err, user) => {
-                            if (err) {
-                              return console.log(err)
-                            }
-                          })
-                          res.status(200).send({token, registeredUser})
-                        }
-                      })
-
-                      // res.status(200).send({token, registeredUser})
+                      res.status(200).send({token, registeredUser})
                     }
                   })
                 }
