@@ -19,13 +19,14 @@ const client = new eventful.Client('KNTLkbbm3QH6vhQf')
 const User = require('../models/user')
 const Event = require('../models/event')
 const Post = require('../models/post')
+const Message = require('../models/message')
 
-// const url = 'mongodb://localhost:27017/fanzik'
-const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
+const url = 'mongodb://localhost:27017/fanzik'
+// const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
 
 const EventFul = 'http://api.eventful.com/js/api'
 
-const adminId = '5c03b8bfbd890635ccaaf2ca'
+const adminId = '5c0547badd1e0805d48c198e'
 
 router.use(cors())
 
@@ -135,8 +136,8 @@ router.post('/register', (req, res, next) => {
                         secure: false,
                         port: 25,
                         auth: {
-                          user: 'glaizet@gmail.com',
-                          pass: 'Lolo24041989'
+                          user: 'admin@fanzik.org',
+                          pass: 'Lolo24041989_'
                         },
                         tls: {
                           rejectUnauthorized: false
@@ -348,8 +349,6 @@ router.get('/user/me', verifyToken, (req, res) => {
 })
 
 router.get('/user/:id', verifyToken, (req, res) => {
-  // console.log('req.params  '  + JSON.stringify(req.params))
-  // console.log(res)
   let userData = req.params
   // console.log(userData.id);
   User.findOne({_id: userData.id}, (err, data) => {
@@ -369,12 +368,16 @@ router.get('/user/:id', verifyToken, (req, res) => {
 
 
 router.get('/users/:ids', verifyToken, (req, res) => {
-  // console.log('ids   '   + typeof req.params.ids)
+    let ids = req.params.ids
+    ids = ids.split(',')
+    console.log(ids)
 
-  User.find({ $and : [{_id: { $in: req.params.ids}}, {deleted : { $ne : true}}]}, (err,users) => {
+
+  User.find({ $and : [{_id: { $in: ids}}, {deleted : { $ne : true}}]}, (err,users) => {
     if (err) {
       console.log(err);
     } if (users) {
+      console.log(users)
       res.status(200).json(users)
     } else if (!users) {
       res.status(403).send('no user found')
@@ -489,36 +492,27 @@ router.put('/friend/invite', verifyToken, (req, res) => {
 
 
 router.put('/friend/accept', verifyToken, (req, res) => {
-  console.log(req.body);
-  console.log(req.body.userId1)
-  User.findOneAndUpdate({_id: req.body.userId1, 'friends._id': req.body.userId2}, {$set: {'friends.$.status' : 'confirmé'}}, {new: true},  (err, userId1) => {
+  let id1 = req.body.userId1.id
+  let id2 = req.body.userId2.id
+  console.log(id1)
+  console.log(id2)
+  User.findOneAndUpdate({_id: id1, 'friends.id': id2}, {$set: {'friends.$.status' : 'confirmed'}}, {new: true},  (err, userId1) => {
     if (err) {
       console.log(err);
     } if (userId1) {
-      console.log(userId1);
-      console.log(req.body.userId2);
-      User.findOneAndUpdate({_id: req.body.userId2, 'friends._id': req.body.userId1}, {$set: {'friends.$.status' : 'confirmé'}}, {new: true},  (err, userId2) => {
+      User.findOneAndUpdate({_id: id2, 'friends.id': id1}, {$set: {'friends.$.status' : 'confirmed'}}, {new: true},  (err, userId2) => {
         if (err) {
           console.log(err);
         } if (userId2) {
           let data = {userId1, userId2}
           res.status(200).json(data)
         } if (!userId2) {
-          User.findOneAndUpdate({_id: req.body.userId2}, {$push: {'friends': { _id: userId1._id, email: userId1.email, status: 'confirmé'}}}, (err, user2) => {
-            if (err) {
-              console.log(err);
-            } if (user2) {
-              let data = {userId1, user2}
-              res.status(200).json(data)
-            } else if (!user2) {
-              res.status(401).send('no user finds')
-            }
-          })
+          res.status(401).send('no user 2 find')
         }
       })
     } if (!userId1) {
       console.log('user1');
-      res.status(401).send('no user finds')
+      res.status(401).send('no user 1 finds')
     }
   })
 })
@@ -527,22 +521,26 @@ router.put('/friend/accept', verifyToken, (req, res) => {
 
 
 router.put('/friend/decline', verifyToken, (req, res) => {
-  User.findByIdAndUpdate(req.body.userId1, { "$pull": {"friends" : {"_id" : req.body.userId2}}}, {new: true}, (err, userId1) => {
+  let id1 = req.body.userId1
+  let id2 = req.body.userId2
+  console.log(id1)
+  console.log(id2)
+  User.findByIdAndUpdate(id1, { "$pull": {"friends" : {"id" : id2}}}, {new: true}, (err, userId1) => {
     if (err) {
       console.log(err);
     } if (userId1) {
-      User.findByIdAndUpdate(req.body.userId2, {"$pull": { "friends" : {"_id" : req.body.userId1}}}, {new: true},  (err, userId2) => {
+      User.findByIdAndUpdate(id2, {"$pull": { "friends" : {"id" : id1}}}, {new: true},  (err, userId2) => {
         if (err) {
           console.log(err);
         } if (userId2) {
           let data = {userId1, userId2}
           res.status(200).json(data)
         } if (!userId2) {
-          res.status(401).send('no user found')
+          res.status(401).send('no user 2 found')
         }
       })
     } if (!userId1) {
-      res.status(401).send('no user found')
+      res.status(401).send('no user 1 found')
     }
   })
 })
@@ -624,11 +622,13 @@ router.get('/post/fetch/:id/:ids', (req, res) => {
   let id = req.params.id
   console.log(req.params.ids)
   let friends = req.params.ids
-  console.log(friends.length)
+  console.log('friends ' + friends.length)
+  friends = friends.split(',')
+  console.log(friends)
   // friends.forEach((friend) => {
   //   ids.push(friends)
   // })
-  Post.find({ $or : [{creatorId: id}, {creatorId: friends}]}, (err,posts) => {
+  Post.find({ $or : [{creatorId: id},{ $and : [{creatorId: {$in : friends}}, {receiverId: id}]}]}, (err,posts) => {
     if (err) {
       return console.log(err)
     }
@@ -638,6 +638,18 @@ router.get('/post/fetch/:id/:ids', (req, res) => {
 })
 
 router.post('/post/create', (req, res) => {
+  let post = req.body
+  Post.create(post, (err, post) => {
+    if (err) {
+      return console.log(err)
+    }
+    if (post) {
+      res.status(200).send(post)
+    }
+  })
+})
+
+router.post('/post/createonfriendwall', (req, res) => {
   let post = req.body
   Post.create(post, (err, post) => {
     if (err) {
@@ -693,6 +705,20 @@ router.get('/events/favorite/:id', (req, res) => {
       res.status(200).json(events)
     } else if (!events) {
       res.status(401).send('No event')
+    }
+  })
+})
+
+router.get('/events/friendsfavorite/:ids', (req, res) => {
+  let ids = req.params.ids.split(',')
+  console.log('friends in favorite events ' + ids)
+  Event.find({$or: [{"participanUSers._id" : {$in : ids}}, {"interestedUsers._id": { $in : ids}}]}, (err, events) => {
+    if (err) {
+      return console.log(err)
+    } if (events) {
+      res.status(200).json(events)
+    } else if (!events) {
+      res.status(401).send('No Event')
     }
   })
 })
@@ -829,16 +855,16 @@ router.post('/event/create', (req, res) => {
 // -------------------------------------------------------------------- Discussions -----------------------------------------------------
 
 
-router.get('/discussions/:id', verifyToken, (req, res) => {
+router.get('/message/:id', verifyToken, (req, res) => {
   console.log(req.params.id)
   let id = req.params.id
-  Disc.find({$or: [{"eventCreator._id": id},{"participants._id": req.params.id}]}, (err, discussions) => {
+  Message.find({$or: [{"eventCreator": id},{"eventReceivers": req.params.id}]}, (err, discussions) => {
     if (err) {
       console.log(err)
     } if (discussions) {
       res.status(200).json(discussions)
     } if (!discussions) {
-      res.status(403).send('no discussion found')
+      res.status(403).send('no message found')
     }
   })
 })
@@ -854,8 +880,8 @@ router.get('/discussion/:id', verifyToken, (req, res) => {
   })
 })
 
-router.post('/discussion/post', verifyToken, (req, res) => {
-  Disc.create(req.body, (err, disc) => {
+router.post('/message/post', verifyToken, (req, res) => {
+  Message.create(req.body, (err, disc) => {
     if (err) {
       console.log(err);
     } if (disc) {
@@ -1426,9 +1452,6 @@ router.get('/event/eventful/:artist/:id', (req, res) => {
   let artist = req.params.artist
   let id = req.params.id
   console.log(id)
-  // client.listCategories((err, data) => {
-  //   console.log(data)
-  // })
   client.searchEvents({keywords: artist, page_size: 50}, (err, data) => {
     if (err) {
       return console.log(err)

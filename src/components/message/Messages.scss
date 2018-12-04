@@ -1,0 +1,33 @@
+@import '../../style/variables.styl';
+
+.nav {
+
+  .nav-item {
+    color: red;
+
+    &:active {
+      background: red !important;
+      color: white !important;
+    }
+  }
+
+
+}
+
+
+.tab-pane {
+  padding-bottom: 10px;
+}
+
+#messages {
+
+  .messages {
+    width: 100%;
+    margin: 30px auto;
+    padding: 0 ;
+    border: 2px solid $orange;
+    border-radius: 15px;
+
+
+  }
+}

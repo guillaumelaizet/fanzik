@@ -11,6 +11,7 @@ import Artist from '@/components/search/Artist'
 import Settings from '@/components/settings/Settings'
 import EventDetail from '@/components/search/EventDetail'
 import UserList from '@/components/wallme/UserList'
+import FriendList from '@/components/search/FriendList'
 
 Vue.use(Router)
 
@@ -66,6 +67,12 @@ const router = new Router({
       path: '/userList',
       name: 'userlist',
       component: UserList
+    },
+    {
+      path: '/friendlist',
+      name: 'friendlist',
+      component: FriendList
+
     }
   ]
 })

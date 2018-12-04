@@ -1,6 +1,7 @@
 @import '../../style/variables.styl';
 
 .post {
+  margin-top: 20px;
   width: 80%;
   margin: 10px auto;
   // padding: 10px;
@@ -19,40 +20,302 @@
       justify-content: space-between;
       .user-info {
 
-        display: flex;
-        .avatar {
+        width: 100%;
 
-          img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50px;
+        .post-receive {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+
+          .creator {
+            display: flex;
+            .avatar {
+
+              img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50px;
+              }
+            }
+
+            .info {
+              margin: auto 0 auto 10px;
+
+              p {
+                margin: 0
+              }
+            }
+          }
+
+          .title {
+            margin: auto 0 auto 10px;
+
+            p {
+              margin: 0;
+            }
           }
         }
 
-        .title {
+        .post-send {
+          display: flex;
+          justify-content: space-between;
+          .receiver {
+            display: flex;
+            .avatar {
 
-          margin-left: 10px;
+              img {
+                width: 50px;
+                hegiht: 50px;
+                border-radius: 50px;
+              }
 
-          .pseudo {
+            }
 
-            text-align: left;
-            color: $darkOrange;
+            .info  {
+              display: flex;
+              // flex-direction: column;
+              p {
+                margin: auto 10px;
+              }
+
+            }
+
           }
-          .time-post {
+          .title {
+            margin: auto 0;
+          }
+        }
 
-            text-align: left;
-            font-size: 0.8em;
-            color: #fff;
+        .post-write {
+          display: flex;
+          justify-content: space-between;
+
+          p {
+            margin: 0;
+            padding: 10px 0;
+          }
+
+        }
+
+        .post-friend {
+
+          .avatar {
+
+            img {
+              width: 50px;
+              height: 50px;
+              border-radius: 50px;
+            }
+
+          }
+
+          .info {
+
           }
         }
 
       }
 
+      .user-info {
+
+        .favorite-event {
+
+          display: flex;
+          justify-content: space-between;
+
+          p {
+            margin: 0;
+            padding: 10px 0 ;
+          }
+        }
+
+        .favorite-event-user {
+            display: flex;
+            justify-content: space-between;
+          .creator {
+            display: flex;
+            // justify-content: space-between;
+
+            .avatar {
+              display: flex;
+
+              img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50px;
+              }
+            }
+
+            .info {
+              margin: auto 0;
+              p {
+                margin: auto 0 auto 10px;
+              }
+            }
+          }
+
+          .title {
+              margin: auto 0;
+            p {
+              margin: auto 0;
+            }
+          }
+        }
+
+        .participate-event {
+          display: flex;
+          justify-content: space-between;
+
+          p {
+            margin: 0;
+            padding: 10px 0;
+          }
+
+        }
+
+        .participate-event-user {
+          display: flex;
+          justify-content: space-between;
+        .creator {
+          display: flex;
+          // justify-content: space-between;
+
+          .avatar {
+            display: flex;
+
+            img {
+              width: 50px;
+              height: 50px;
+              border-radius: 50px;
+            }
+          }
+
+          .info {
+            margin: auto 0;
+            p {
+              margin: auto 0 auto 10px;
+            }
+          }
+        }
+
+        .title {
+            margin: auto 0;
+          p {
+            margin: auto 0;
+          }
+        }
+        }
+      }
+
+    }
+
+    .other-wall {
+      width: 100%;
+      // display: flex;
+      .post {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        background: $orange;
+
+        .bloc-user {
+            display: flex;
+
+          .avatar {
+
+            img {
+              width: 50px;
+              height: 50px;
+              border-radius: 50px;
+            }
+
+          }
+          .info {
+            margin: auto 0 auto 10px;
+
+            p {
+              margin: 0
+            }
+          }
+        }
+
+        .date {
+          margin: auto 0;
+          p {
+            margin: auto 0 auto 0;
+          }
+        }
+      }
+
+      .event {
+
+        .favorite {
+          display: flex;
+          justify-content: space-between;
+          .bloc-user {
+            display: flex;
+            .avatar {
+
+              img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50px;
+              }
+            }
+
+            .info {
+
+              margin: auto 0;
+              p {
+                margin: auto 0 auto 10px;
+              }
+            }
+          }
+
+          .date {
+            margin: auto 0;
+            p {
+              margin: auto 0;
+            }
+          }
+        }
+
+        .participate {
+          display: flex;
+          justify-content: space-between;
+          .bloc-user {
+            display: flex;
+            .avatar {
+              img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50px;
+              }
+            }
+
+            .info {
+              margin: auto 0;
+              p {
+                margin: auto 0 auto 10px;
+              }
+            }
+          }
+
+          .date {
+            margin: auto 0;
+            p {
+              margin: auto 0;
+            }
+          }
+        }
+      }
     }
   }
 
   .body-post {
     padding: 10px;
+    margin: auto 0;
 
     .post-no-event {
       text-align: left;
@@ -84,11 +347,16 @@
   .border {
     width: 50%;
     margin: auto;
-    border-bottom: 1px solid grey;
-    background-color: grey;
+    margin-bottom: 30px;
+    // background: grey;
+    // border-bottom: 1px solid grey;
   }
 
   .border-top {
+    width: 50%;
+    margin: auto;
+    // background: grey;
+    // border: 1px solid grey;
     margin-top: 30px;
   }
   .footer-post {
@@ -127,7 +395,7 @@
     .post-comment {
       display: flex;
       border-top: 1px solid lightgrey;
-      margin-top: 30px;
+      margin-top: 15px;
       .avatar {
         img {
           width: 40px;

@@ -4,8 +4,8 @@ import countries from './countries.json'
 
 let singleInstance
 
-let path = 'http://www.fanzik.org/'
-// let path = 'http://localhost:3000/'
+// let path = 'http://www.fanzik.org/'
+let path = 'http://localhost:3000/'
 
 class Service {
   constructor () {
@@ -158,11 +158,9 @@ class Service {
 
   fetchAllUsers () {
     const url = path + 'api/allusers'
-    console.log('ok from Service')
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((users) => {
-        console.log(users)
-        resolve(users)
+        resolve(users.body)
       },
       (error) => {
         console.log(error)
@@ -175,10 +173,8 @@ class Service {
   fetchPosts (id, friends) {
     let ids = []
     friends.forEach((friend) => {
-      console.log(friend._id)
       ids.push(friend._id)
     })
-    console.log(ids)
     const url = `${path}api/post/fetch/${id}/${ids}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
@@ -190,9 +186,23 @@ class Service {
     })
   }
 
+
   createPost (post) {
     console.log(post)
     const url = path + 'api/post/create'
+
+    return new Promise((resolve, reject) => {
+      return Vue.http.post(url, post).then((response) => {
+        resolve(response.body)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  createPostOnFriendWall (post) {
+    const url = path + 'api/post/createonfriendwall'
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, post).then((response) => {
@@ -238,7 +248,19 @@ class Service {
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response.body)
+        resolve(response.body)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  fetchFavoriteFromFriends (ids) {
+    const url = `${path}api/events/friendsfavorite/${ids}`
+    console.log(url)
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
         resolve(response.body)
       },
       (error) => {
@@ -252,7 +274,6 @@ class Service {
 
     return new Promise((resolve, reject) => {
       return Vue.http.post(url, event).then((response) => {
-        console.log(response)
         resolve(response.data)
       },
       (error) => {
@@ -262,7 +283,6 @@ class Service {
   }
 
   followEvent (event) {
-    console.log(event)
     const url = path + 'api/event/follow'
 
     return new Promise((resolve, reject) => {
@@ -317,7 +337,6 @@ class Service {
   // --------------------------------------------------------- EventFul ----------------------------------------------------
 
   fetchMusics (artists) {
-    console.log(artists)
     let q = []
     artists.forEach((artist) => {
       if (artist.includes('&')) {
@@ -355,7 +374,6 @@ class Service {
       return Vue.http.get(url).then((response) => {
         if (JSON.stringify(response.body.data) !== '[]') {
           let events = response.body.data
-          console.log(events)
           resolve(events)
         } else {
           resolve(response.body.data)
@@ -368,12 +386,10 @@ class Service {
   }
 
   fetchEvent (artist, id) {
-    console.log('fetchEvent')
-    const url = `${path}}api/event/eventful/${artist}/${id}`
+    const url = `${path}api/event/eventful/${artist}/${id}`
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response)
         let event = response.body.data
         resolve(event)
       },
@@ -388,7 +404,6 @@ class Service {
 
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response)
         let event = response.body.data
         resolve(event)
       },
@@ -420,7 +435,6 @@ class Service {
     const url = `${path}api/callback?code=${code}&state=${state}&id=${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response.data)
         resolve(response.data)
       },
       (error) => {
@@ -571,7 +585,6 @@ class Service {
     const url = `${path}api/user/spotify/top/${token}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response.data)
         resolve(response.data)
       })
     })
@@ -595,11 +608,42 @@ class Service {
     })
   }
 
+  acceptFriendship(userId1, userId2) {
+    let data = {
+      userId1: userId1,
+      userId2: userId2
+    }
+    const url = path + 'api/friend/accept'
+    return new Promise((resolve, reject) => {
+      return Vue.http.put(url, data).then((response) => {
+        resolve(response.body)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  declineFriendship (userId1, userId2) {
+    let data = {
+      userId1: userId1,
+      userId2: userId2
+    }
+    const url = path + 'api/friend/decline'
+    return new Promise((resolve, reject) => {
+      return Vue.http.put(url, data).then((response) => {
+        resolve(response.body)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
   fetchFriends (id) {
     const url = `${path}api/friends/${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response)
         resolve(response)
       },
       (error) => {
@@ -612,7 +656,32 @@ class Service {
     const url = `${path}api/friend/pending/${id}`
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((response) => {
-        console.log(response)
+        resolve(response)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  // --------------------------- Message ----------------
+
+  fetchMessages (id) {
+    const url = `${path}api/message/${id}`
+    return new Promise((resolve, reject) => {
+      return Vue.http.get(url).then((response) => {
+        resolve(response)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  createMessage (message) {
+    const url = `${path}api/message/post`
+    return new Promise((resolve, reject) => {
+      return Vue.http.post(url, message).then((response) => {
         resolve(response)
       },
       (error) => {

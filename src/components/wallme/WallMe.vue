@@ -1,14 +1,17 @@
 <template lang="html">
   <div class="blocglobal">
-    <div v-on:click="authSpotify()" v-if="spoti_auth === false" class="auth-spotify">
+    <div v-on:click="authSpotify()" v-if="!spoti_auth && meWall" class="auth-spotify">
       <img src="../../assets/spotify.png" alt="" class="spotify-image">
       <div class="auth-text">
         Synchronise avec ton compte spotify pour pouvoir profiter au maximum de ton expérience
       </div>
     </div>
+    <div v-if="currentUser.description" class="description">
+        <p>Description: {{currentUser.description}}</p>
+    </div>
     <div class="blocinter">
-      <div v-if="isFriend || meWall" class="globalEvents">
-        <div class="globalPost">
+      <div v-if="isFriend || meWall " class="globalEvents">
+        <div v-if="currentUser.pseudo !== 'admin'"class="globalPost">
           <form class="form" role="form">
             <div class="form-group">
               <div class="input-group">
@@ -18,7 +21,6 @@
             </div>
           </form>
         </div>
-
         <div class="renderEventsList">
           <posts
           v-for="event in events"
@@ -61,10 +63,10 @@
           <p>Event suivi: <span>{{interestedEvents.length}}</span></p>
           <p>Participation: <span>{{participateEvents.length}}</span></p>
         </div>
-        <div class="friends-user">
-          <p>Ami(s): <span>{{this.myFriends.length}}</span></p>
+        <div v-if="currentUser.pseudo !=='admin'" class="friends-user">
+          <p>Amis: </p>
         </div>
-        <div class="friends-list">
+        <div v-if="currentUser.pseudo !=='admin'" class="friends-list">
           <div v-if=" currentUser.friends && currentUser.friends.length > 0" class="list">
             <div v-if="currentUser._id === userMe._id " class="">
               <div class="" v-for="friend in myFriends" :key="friend._id">
@@ -217,9 +219,7 @@ export default {
 
     isFriend () {
       if (this.friends.length !== 0) {
-        return this.friends.filter((user) => {
-          user.friends.filter(friend => friend.id === this.userMe._id && friend.status === 'confirmed').length > 0
-        })
+        return this.friends.filter(user => user._id === this.userMe._id).length > 0
       } else {
         return false
       }
@@ -238,6 +238,7 @@ export default {
   },
 
   mounted: function () {
+    document.getElementById('spinner').style.display = 'none'
     if (route.history.current.query.auth === 'accept') {
       Service.instance.fetchMe().then((response) => {
         this.userMe = response
@@ -251,13 +252,10 @@ export default {
 
     buildScreen () {
       let id = route.history.current.query.id
-      console.log(route.history.current.query.code)
       if (route.history.current.query.code !== undefined) {
         console.log('go receive credentials')
         this.receiveSpotifyCredentials()
       } else {
-
-        // document.getElementById('spinner').style.display = 'initial'
         Service.instance.fetchMe().then((response) => {
           this.userMe = response
           console.log('userMe ' + this.userMe)
@@ -278,13 +276,11 @@ export default {
             }
             Service.instance.fetchFriends(this.userMe._id).then((friends) => {
               this.friends = friends.body
-              console.log('friends ' + this.friends)
               let ids = []
               this.friends.forEach((friend) => {
                 ids.push(friend._id)
               })
               Service.instance.fetchFavorite(this.userMe._id).then((events) => {
-                document.getElementById('spinner').style.display = 'none'
                 this.interestedEvents = events.filter((event) => {
                   if (event.interestedUsers.length > 0) {
                     return event.interestedUsers.filter((user) => {
@@ -304,6 +300,17 @@ export default {
                   }
                 })
                 this.events = events
+                console.log(ids)
+                Service.instance.fetchFavoriteFromFriends(ids).then((friendsFavorite) => {
+                  // friendsFavorite.forEach((favorite) => {
+                  //   console.log(favorite)
+                  //   self.event = self.events.push(favorite)
+                  // })
+                  console.log(this.events)
+                  console.log(friendsFavorite)
+                  this.events = this.events.concat(friendsFavorite)
+                  console.log(this.events)
+                })
                 this.fetchPostFromMe()
               })
             })
@@ -321,12 +328,11 @@ export default {
               Service.instance.fetchFriends(this.currentUser._id).then((friends) => {
                 this.friends = friends.body
                 let ids = []
-                console.log(this.friends)
+                console.log('friends of current wall user ' + this.friends)
                 this.friends.forEach((friend) => {
                   ids.push(friend._id)
                 })
                 Service.instance.fetchFavorite(this.currentUser._id).then((events) => {
-                  document.getElementById('spinner').style.display = 'none'
                   this.interestedEvents = events.filter((event) => {
                     if (event.interestedUsers.length > 0) {
                       return event.interestedUsers.filter((user) => {
@@ -398,19 +404,32 @@ export default {
     },
     // --------------------------------------- post ---------------------------
     createPost (e) {
-      let post = {
-        creatorId: this.userMe._id,
-        post: document.getElementById('search').value
-      }
+      if (this.wallme) {
+        let post = {
+          creatorId: this.userMe._id,
+          post: document.getElementById('search').value
+        }
 
-      Service.instance.createPost(post).then((response) => {
-        this.events.push(response)
-      })
+        Service.instance.createPost(post).then((response) => {
+          this.events.push(response)
+        })
+      } else {
+        let post = {
+          creatorId: this.userMe._id,
+          receiverId: this.currentUser._id,
+          post: document.getElementById('search').value
+        }
+
+        Service.instance.createPostOnFriendWall(post).then((response) => {
+          this.events.push(response)
+        })
+      }
     },
 
     fetchPostFromMe (e) {
       Service.instance.fetchPosts(this.userMe._id, this.friends).then((response) => {
         console.log(response)
+        console.log(JSON.stringify(this.events))
         this.events = this.events.concat(response)
       })
     },
@@ -456,7 +475,7 @@ export default {
     },
 
     goToUserWall (id) {
-      this.$router.push('/home/' + id)
+      this.$router.push({path: '/home', query: {id: id}})
       EventBus.$emit('goToUserWall')
     }
   }

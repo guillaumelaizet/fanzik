@@ -83,6 +83,7 @@ export default {
     Service.instance.fetchExistingEvent(id).then((response) => {
       console.log(response)
       if (response.body === 'No Event found') {
+        console.log('no event found')
         Service.instance.fetchEvent(artist, id).then((response) => {
           document.getElementById('spinner').style.display = 'none'
           this.ready = true

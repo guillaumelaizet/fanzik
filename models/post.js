@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 
 const postSchema = new Schema({
   creatorId: String,
+  receiverId: String,
   post: String,
   comments: [],
   date: {type: Date, default: Date.now}

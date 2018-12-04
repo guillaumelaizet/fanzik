@@ -33,14 +33,16 @@
     </div>
     <div class="artist-events">
       <h1>Ses prochains concerts</h1>
+      <p v-if="events">{{events.length}} events trouvés</p>
+      <p v-else>0 events trouvés</p>
       <div id="spinner" class="" style="width:30px; height: 30px; position: absolute; top: 50%; transform: translateY(-50%); z-index: 50000; display: none;">
         <div class="spinner">
           <fade-loader loading="loading" color="orange" size="40px"></fade-loader>
         </div>
       </div>
       <div v-if="ready" class="form-group">
-        <select class="form-control" name="">
-          <option  v-for="month in date" v-on:click="showEvents(month, date, $event)" :value="month" >{{month}}</option>
+        <select @click="showEvents(date, $event)" class="form-control" name="">
+          <option  v-for="month in date" :value="month" :key="month.id">{{month}}</option>
         </select>
       </div>
       <div class="list-events" v-for="month in date" :key="month.id">
@@ -114,7 +116,6 @@ export default {
     },
 
     buildScreen () {
-      // this.showSpinner()
       this.init()
       Service.instance.fetchMe().then((response) => {
         this.user = response
@@ -136,11 +137,13 @@ export default {
 
               this.events = response.search.events.event
               moment.locale('fr')
-              this.events.sort((a, b) => {
-                a = new Date(moment(a.start_time)).getTime()
-                b = new Date(moment(b.start_time)).getTime()
-                return a === b ? a : a > b ? 1 : -1
-              })
+              if (this.events) {
+                this.events.sort((a, b) => {
+                  a = new Date(moment(a.start_time)).getTime()
+                  b = new Date(moment(b.start_time)).getTime()
+                  return a === b ? a : a > b ? 1 : -1
+                })
+              }
             })
           })
         })
@@ -161,7 +164,9 @@ export default {
       return moment(event.start_time).format('MMMM') === month
     },
 
-    showEvents (month, date, e) {
+    showEvents (date, e) {
+      console.log('enter')
+      let month = e.currentTarget.value
       let doc = document.getElementsByClassName(month)
       date.forEach((ele) => {
         if (ele !== month) {

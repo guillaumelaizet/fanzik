@@ -1,45 +1,185 @@
 <template lang="html">
   <div class="post">
     <div class="header-post">
-      <div class="user">
-        <div class="user-info">
-          <div class="avatar">
-            <div v-if="evt.creatorId === currentUser._id || ownPost" class="">
-              <img v-if="currentUser.avatar" :src="currentUser.avatar" alt="">
-              <img v-else src="../../assets/anonyme.jpeg" alt="">
+      <div class="">
+        <div v-if="myWall" class="user">
+          <div v-if="evt.creatorId" class="user-info">
+            <div v-if="evt.receiverId && evt.receiverId === me._id" class="post-receive">
+              <div class="creator">
+                <div class="avatar">
+                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{creator.pseudo}} a posté sur votre mur</p>
+                </div>
+              </div>
+              <div class="title">
+                <p>{{friendlyDate(evt.date)}}</p>
+              </div>
             </div>
-            <div v-else class="">
-              <div v-on:click="goToUserWall(user._id)" class="blabla">
-                <img v-if="evt.creatorId === user._id" src="../../assets/anonyme.jpeg" alt="">
-
+            <div v-if="evt.receiverId && evt.creatorId === me._id" class="post-send">
+             <div class="receiver">
+               <div v-on:click="goToUserWall(receiver._id)" class="avatar">
+                 <img v-if="receiver.avatar" :src="receiver.avatar" alt="">
+                 <img v-else src="../../assets/anonyme.jpeg" alt="">
+               </div>
+               <div class="info">
+                 <p>{{receiver.pseudo}} (Vous avez poster sur son mur)</p>
+               </div>
+             </div>
+             <div class="title">
+               {{friendlyDate(evt.date)}}
+             </div>
+            </div>
+            <div v-if="evt.creatorId === me._id && !evt.receiverId" class="post-write">
+              <p>Vous avez poster<p>
+              <p>{{friendlyDate(evt.date)}}</p>
+            </div>
+            <div v-if="evt.creatorId !== me._id && !evt.receiverId" class="post-friend">
+              <div class="avatar">
+                <div v-on:click="goToUserWall(creator._id)" class="avatar">
+                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+              </div>
+              <div class="info">
+                {{creator.pseudo}} a poster
               </div>
             </div>
           </div>
-          <div class="title">
-            <div v-if="!evt.creatorId" class="">
-              <div v-if="ownPost && myWall" class="pseudo">
-                Vous {{title}}
+          <div v-else class="user-info">
+            <div v-if="favoriteFromMe"class="favorite-event">
+              <p>Vous êtes intéressé par cet évènement</p>
+              <p>{{friendlyDate(date)}}</p>
+            </div>
+            <div v-if="favoriteFromUsers" class="favorite-event-user">
+              <div class="creator">
+                <div class="avatar">
+                  <img v-if="interestedfriends[0].avatar" :src="interestedfriends[0].avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{interestedfriends[0].pseudo}} s'est intéressé(e) à cet évènement</p>
+                </div>
               </div>
-              <div v-else class="pseudo">
-                {{currentUser.pseudo}} {{title}}
+              <div class="title">
+                {{friendlyDate(date)}}
               </div>
             </div>
-            <div v-else class="">
-              <div v-if="ownPost" class="pseudo">
-              Vous avez écrit
+            <div v-if="participateFromMe"class="participate-event">
+              <p>Vous participez à cet évènement</p>
+              <p>{{friendlyDate(date)}}</p>
+            </div>
+            <div v-if="participateFromUsers" class="participate-event-user">
+              <div class="creator">
+                <div class="avatar">
+                  <img v-if="particpateFriends[0].avatar" :src="particpateFriends[0].avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{particpateFriends[0].pseudo}} participe à cet évènement</p>
+                </div>
               </div>
-              <div v-else class="pseudo">
-                {{user.pseudo}} a écrit
+              <div class="title">
+                {{friendlyDate(date)}}
               </div>
             </div>
-            <div class="time-post">
-              {{friendlyDate}}
+          </div>
+        </div>
+        <div v-else class="other-wall">
+          <div v-if="evt.creatorId"class="post">
+            <div v-if="evt.receiverId && evt.receiverId === me._id" class="post">
+              <div class="bloc-user">
+                <div class="avatar">
+                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{creator.pseudo}} a écrit sur votre mur</p>
+                </div>
+              </div>
+              <div class="date">
+                {{friendlyDate(evt.date)}}
+              </div>
+            </div>
+            <div v-if="evt.creatorId === me._id && evt.receiverId === currentUser._id "class="post">
+              <div class="bloc-user">
+                <div class="avatar">
+                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>Vous avez écrit sur son mur</p>
+                </div>
+              </div>
+              <div class="date">
+                {{friendlyDate(evt.date)}}
+              </div>
+            </div>
+            <div v-if="evt.creatorId === currentUser._id && !evt.receiverId" class="post">
+              <div class="bloc-user">
+                <div class="avatar">
+                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{creator.pseudo}} a écrit</p>
+                </div>
+              </div>
+              <div class="date">
+                {{friendlyDate(evt.date)}}
+              </div>
+            </div>
+            <div v-if="evt.creatorId === currentUser._id && evt.receiverId && evt.receiverId !== me._id "class="post">
+              <div class="bloc-user">
+                <div class="avatar">
+                  <img v-if="creator.avatar" :src="creator.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{creator.pseudo}} a écrit sur le mur de {{receiver.pseudo}}</p>
+                </div>
+              </div>
+              <div class="date">
+                {{friendlyDate(evt.date)}}
+              </div>
+            </div>
+          </div>
+          <div v-else class="event">
+            <div v-if="favoriteFromMe" class="favorite">
+              <div class="bloc-user">
+                <div class="avatar">
+                  <img v-if="currentUser.avatar" :src="currentUser.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{currentUser.pseudo}} est intéressé par cet event</p>
+                </div>
+              </div>
+              <div class="date">
+                {{friendlyDate(date)}}
+              </div>
+            </div>
+            <div v-if="participateFromMe" class="participate">
+              <div class="bloc-user">
+                <div class="avatar">
+                  <img v-if="currentUser.avatar" :src="currentUser.avatar" alt="">
+                  <img v-else src="../../assets/anonyme.jpeg" alt="">
+                </div>
+                <div class="info">
+                  <p>{{currentUser.pseudo}} participe a cet evènement</p>
+                </div>
+              </div>
+              <div class="date">
+                {{friendlyDate(date)}}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="border border-top">
+    <div class="border-top">
     </div>
     <div class="body-post">
       <div v-if="evt.creatorId" class="post-no-event">
@@ -65,7 +205,7 @@
     </div>
     <div v-if="evt.creatorId" class="footer-post">
       <div v-if="evt.comments.length > 0" class="list-comments">
-        <div class="" v-for="comment in evt.comments" :key="comment.id">
+        <div class="" v-for="comment in evt.comments" :key="comment._id">
           <div class="comment">
             <div class="avatar">
               <img v-if="comment.avatar" :src="comment.avatar" alt="">
@@ -87,8 +227,8 @@
 
             <div class="form-group">
               <div class="input-group">
-                <input  id="comment" name="search" type="text" class="form-control" placeholder="Répondre...">
-                <button type="button" v-on:click="commentPost()" class="btn btn-primary" name="button">submit</button>
+                <input  :id="evt._id" name="search" type="text" class="form-control" placeholder="Répondre...">
+                <button type="button" v-on:click="commentPost(evt._id)" class="btn btn-primary" name="button">submit</button>
               </div>
             </div>
           </form>
@@ -112,100 +252,74 @@ export default {
 
   data () {
     return {
-      user: {},
+      creator: {},
+      receiver: {},
       interestedfriends: [],
-      particpateFriends: []
+      particpateFriends: [],
+      date: String
     }
   },
 
   mounted: function () {
-    console.log(this.me)
+
     if (this.evt.creatorId) {
       Service.instance.fetchUser(this.evt.creatorId).then((user) => {
-        this.user = user
+        this.creator = user
       })
+
+      if (this.evt.receiverId) {
+        console.log('receiver' + this.evt.receiverId)
+        Service.instance.fetchUser(this.evt.receiverId).then((receiver) => {
+          this.receiver = receiver
+        })
+      }
     } else if (this.evt.idEvent) {
       if (this.evt.interestedUsers) {
+        console.log(this.friends)
         let ids = []
         this.evt.interestedUsers.forEach((user) => {
           this.friends.forEach((friend) => {
+            console.log(friend)
             if (friend._id === user._id) {
               ids.push(user._id)
+              this.date = user.date
             }
           })
+          if (user._id === this.currentUser._id) {
+            this.date = user.date
+          }
         })
-        Service.instance.fetchUsers(ids).then((response) => {
-          this.interestedfriends = response
-        })
-      } else if (this.evt.participantUsers) {
+        if (ids.length > 0) {
+          Service.instance.fetchUsers(ids).then((response) => {
+            this.interestedfriends = response
+          })
+        }
+      } if (this.evt.participantUsers.length > 0) {
         let ids = []
         this.evt.participantUsers.forEach((user) => {
           this.friends.forEach((friend) => {
             if (friend._id === user._id) {
               ids.push(user._id)
+              this.date = user.date
             }
           })
+          if (user._id === this.currentUser._id) {
+            this.date = user.date
+          }
         })
-        Service.instance.fetchUsers(ids).then((response) => {
-          this.particpateFriends = response
-        })
+        if (ids.length > 0) {
+          Service.instance.fetchUsers(ids).then((response) => {
+            this.particpateFriends = response
+          })
+        }
       }
     }
   },
 
   computed: {
-    friendlyDate () {
-      if (this.evt.interestedUsers !== undefined && this.evt.interestedUsers.length !== 0) {
-        let interested = this.evt.interestedUsers.filter((user) => {
-          return user._id === this.currentUser._id
-        })
-        moment.locale('fr')
-        return 'Le ' + moment(new Date(interested[0].date)).format('LL') + ' à ' + moment(new Date(interested[0].date)).format('LT') + ' H'
-      } else if (this.evt.participantUsers !== undefined && this.evt.participantUsers.length !== 0) {
-        let participate = this.evt.participantUsers.filter((user) => {
-          return user._id === this.currentUser._id
-        })
-        console.log(participate)
-        moment.locale('fr')
-        return 'Le ' + moment(new Date(participate[0].date)).format('LL') + ' à ' + moment(new Date(participate[0].date)).format('LT') + ' H'
-      } else {
-        return 'Le ' + moment(new Date(this.evt.date)).format('LL') + ' à ' + moment(new Date(this.evt.date)).format('LT') + ' H'
-      }
-    },
 
-    ownPost () {
-      if (this.currentUser._id === this.me._id) {
-
-      }
-      if (this.evt.interestedUsers !== undefined && this.evt.interestedUsers.length !== 0) {
-        return this.evt.interestedUsers.filter((user) => {
-          return user._id === this.me._id
-        })
-      } else if (this.evt.participantUsers !== undefined && this.evt.participantUsers.length !== 0) {
-        return this.evt.participantUsers.filter((user) => {
-          return user._id === this.me._id
-        })
-      } else {
-        return this.evt.creatorId === this.me._id
-      }
-    },
-
-    title () {
-      if (this.evt.interestedUsers !== undefined && this.evt.interestedUsers.length !== 0) {
-        let interested = this.evt.interestedUsers.filter((user) => {
-          return user._id === this.currentUser._id
-        })
-        if (interested) {
-          return ' est intéressé par un evenement'
-        }
-      } else if (this.evt.participantUsers !== undefined && this.evt.participantUsers.length !== 0) {
-        let participate = this.evt.participantUsers.filter((user) => {
-          return user._id === this.currentUser._id
-        })
-        if (participate) {
-          return ' participe a un évènement'
-        }
-      }
+    validDate() {
+      // if (this.evt.interestedUsers)
     },
 
     myWall () {
@@ -218,29 +332,61 @@ export default {
       } else {
         return false
       }
+    },
+
+    favoriteFromMe () {
+      if (this.evt.interestedUsers) {
+        return this.evt.interestedUsers.filter(interest => interest._id === this.currentUser._id).length > 0
+      }
+    },
+
+    favoriteFromUsers () {
+      if (this.evt.interestedUsers) {
+        return this.evt.interestedUsers.filter(interest => interest._id !== this.currentUser._id).length > 0
+      }
+    },
+
+    participateFromMe () {
+      if (this.evt.participantUsers) {
+        return this.evt.participantUsers.filter(interest => interest._id === this.currentUser._id).length > 0
+      }
+    },
+
+    participateFromUsers () {
+      if (this.evt.participantUsers) {
+        return this.evt.participantUsers.filter(interest => interest._id !== this.currentUser._id).length > 0
+      }
     }
+
+
   },
 
   methods: {
     goToUserWall (id) {
-      this.$router.push('/home/' + id)
+      this.$router.push({path: '/home', query: {id: id}})
       EventBus.$emit('goToUserWall')
     },
 
-    commentPost () {
+    commentPost (id) {
       let post = {
         idEvent: this.evt._id,
         id: this.me._id,
-        comment: document.getElementById('comment').value,
+        comment: document.getElementById(id).value,
         pseudo: this.me.pseudo
       }
       if (this.me.avatar) {
         post.avatar = this.me.avatar
       }
       Service.instance.commentPost(post).then((event) => {
+        document.getElementById(id).value = ''
         EventBus.$emit('postComment', {event: event})
       })
-    }
+    },
+
+    friendlyDate (date) {
+      moment.locale('fr')
+      return moment(date).fromNow()
+    },
   }
 
 }

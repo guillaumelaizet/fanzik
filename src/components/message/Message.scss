@@ -1,0 +1,34 @@
+@import '../../style/variables.styl';
+
+.message {
+  // margin: 20px auto;
+  width: 100%;
+  padding: 20px;
+  border-bottom: 1px solid $orange;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+
+  .bloc {
+    display: flex;
+
+    .title {
+      display: flex;
+
+      p {
+        margin: auto 10px;
+      }
+    }
+    .description {
+      margin: auto 10px;
+      p {
+        margin: auto 10px;
+      }
+    }
+  }
+
+  .date {
+
+  }
+
+}

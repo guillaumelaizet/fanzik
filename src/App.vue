@@ -3,7 +3,7 @@
     <div id="blur"></div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <!-- <img src="../assets/logo-music.png" alt="" width="60px" height="60px"> -->
-      <a class="navbar-brand" href="#">Music Réseau Social</a>
+      <a class="navbar-brand" href="#">FANZIK <span>Music Réseau Social</span></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -14,8 +14,8 @@
         <ul class="navbar-nav ml-auto">
           <a class="nav-link signin" v-if="token == null || undefined" v-on:click="login()">SignIn</a>
           <a class="nav-link badge-signup" v-if="token == null || undefined" v-on:click="register()"><div>SignUp</div></a>
-          <!-- <a class="nav-link admin" v-if="!token">Admin</a> -->
-          <a class="nav-link settings-nav" v-on:click="goToSettings()" v-if="token"><font-awesome-icon class="icon icon-icon-cog" icon="cog"/></a>
+          <a class="nav-link admin" v-if="token && user.id_flag">Admin</a>
+          <a class="nav-link settings-nav" v-on:click="goToFriendList()" v-if="token"><font-awesome-icon class="icon icon-users" icon="users"/></a>
           <a class="nav-link" v-if="token" v-on:click="goToPrivatemessage()"><font-awesome-icon class="icon icon-icon-envelope" icon="envelope-open"/></a>
           <a class="nav-link" v-if="token" v-on:click="goToEventsSearch()"><font-awesome-icon class="icon icon-icon-calendar" icon="calendar-alt" aria-hidden="true" title="events" alt="title"/></a>
           <!-- <a class="nav-link">Pseudo</a> -->
@@ -151,10 +151,11 @@ export default {
     goToWallMe () {
       console.log(this.user)
       this.$router.push('/home?id=' + this.user._id)
+      EventBus.$emit('goToUserWall')
     },
 
-    goToSettings () {
-      this.$router.push('/settings')
+    goToFriendList () {
+      this.$router.push('/friendlist')
     }
   }
 
@@ -181,6 +182,11 @@ export default {
   min-height: 100vh;
   position: relative;
   z-index: 0;
+}
+
+.navbar-brand span{
+  font-size: 0.8em;
+  margin-left: 5px;
 }
 
 .navbar {

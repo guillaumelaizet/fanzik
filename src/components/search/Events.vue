@@ -38,7 +38,7 @@
           </div>
           <div v-else class="search-no-spoti">
             <div class="events-list">
-              <div  v-on:click="checkEventDetail(event.title, event.$.id)" class="event" v-for="event in events">
+              <div  v-on:click="checkEventDetail(event.title, event.$.id)" class="event" v-for="event in events" :key="event.$.id">
                 <div class="title">
                   <h3>{{event.title}}</h3>
                 </div>
