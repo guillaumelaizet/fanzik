@@ -12,7 +12,7 @@
       <div class="tab-pane fade active show" id="messages">
         <h1>Vos Messages</h1>
         <div class="messages">
-          <message 
+          <message
           v-for="message in messages"
           :message="message"
           :key="message._id"

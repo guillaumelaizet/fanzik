@@ -21,8 +21,8 @@ const Event = require('../models/event')
 const Post = require('../models/post')
 const Message = require('../models/message')
 
-const url = 'mongodb://localhost:27017/fanzik'
-// const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
+// const url = 'mongodb://localhost:27017/fanzik'
+const url = 'mongodb://guiguizzz:lolo24041989@ds261521.mlab.com:61521/music'
 
 const EventFul = 'http://api.eventful.com/js/api'
 
