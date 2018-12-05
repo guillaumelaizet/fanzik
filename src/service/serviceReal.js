@@ -4,8 +4,9 @@ import countries from './countries.json'
 
 let singleInstance
 
-let path = 'http://www.fanzik.org/'
-// let path = 'http://localhost:3000/'
+// let path = 'http://www.fanzik.org/'
+
+let path = 'http://localhost:3000/'
 
 class Service {
   constructor () {
@@ -175,6 +176,19 @@ class Service {
     const url = path + 'api/allusers'
     return new Promise((resolve, reject) => {
       return Vue.http.get(url).then((users) => {
+        resolve(users.body)
+      },
+      (error) => {
+        console.log(error)
+      })
+    })
+  }
+
+  updateUser (user) {
+    console.log(user)
+    const url = `${path}api/user/update/`
+    return new Promise((resolve, reject) => {
+      return Vue.http.put(url, user).then((users) => {
         resolve(users.body)
       },
       (error) => {

@@ -296,7 +296,7 @@ router.put('/changePassword', (req, res) => {
 // -------------------------------------------------------------------- User ----------------------------------------------------------
 
 
-router.put('/user/:id', (req, res) => {
+router.put('/user/update', (req, res) => {
   let userData = req.body
   // console.log('id  '  + req.body._id)
   User.findByIdAndUpdate(userData._id, userData, {new: true}, (err, user) => {
