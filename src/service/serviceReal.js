@@ -4,9 +4,9 @@ import countries from './countries.json'
 
 let singleInstance
 
-// let path = 'http://www.fanzik.org/'
+let path = 'http://www.fanzik.org/'
 
-let path = 'http://localhost:3000/'
+// let path = 'http://localhost:3000/'
 
 class Service {
   constructor () {
