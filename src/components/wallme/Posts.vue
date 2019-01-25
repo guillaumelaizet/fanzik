@@ -318,10 +318,6 @@ export default {
 
   computed: {
 
-    validDate() {
-      // if (this.evt.interestedUsers)
-    },
-
     myWall () {
       return this.currentUser._id === this.me._id
     },

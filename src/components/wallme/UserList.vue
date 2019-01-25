@@ -10,9 +10,6 @@
     </div>
 
     <popup ref="popupNewUSer">
-      <!-- <div slot="header" style="font-size: 18px; font-weight: bold; margin: 20px auto;">
-        Salut a toi le nouveau
-      </div> -->
       <div slot="body">
         <div class="body">
           <div class="h-aligner" slot="header" style="font-size: 18px; font-weight: bold; margin-top: 20px;">Salut a toi le nouveau</div>

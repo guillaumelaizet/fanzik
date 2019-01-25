@@ -124,7 +124,6 @@
     <popup ref="popupSuccessAuthSpotify">
       <div slot="body">
         <div class="headline-blue">
-          <!-- <img src="/assets/checked.svg" width="48px" height="48px" /> -->
           <div class="h-aligner" slot="header" style="font-size: 18px; font-weight: bold; margin-top: 20px;">Parfait, ton compte spoti est bien synchro, tu peux commencer ton expérience ;-)</div>
           <div style="margin-top: 20px; padding-bottom: 5px; font-size: 14px;">
           </div>
@@ -302,10 +301,6 @@ export default {
                 this.events = events
                 console.log(ids)
                 Service.instance.fetchFavoriteFromFriends(ids).then((friendsFavorite) => {
-                  // friendsFavorite.forEach((favorite) => {
-                  //   console.log(favorite)
-                  //   self.event = self.events.push(favorite)
-                  // })
                   console.log(this.events)
                   console.log(friendsFavorite)
                   this.events = this.events.concat(friendsFavorite)
@@ -321,7 +316,6 @@ export default {
               this.fetchSpotifyInfo(this.userMe.access_token)
             }
           } else {
-            // console.log('id' + id)
             Service.instance.fetchUser(id).then((user) => {
               this.currentUser = user
               console.log(this.currentUser)

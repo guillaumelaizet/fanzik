@@ -18,7 +18,6 @@
           <a class="nav-link settings-nav" v-on:click="goToFriendList()" v-if="token"><font-awesome-icon class="icon icon-users" icon="users"/></a>
           <a class="nav-link" v-if="token" v-on:click="goToPrivatemessage()"><font-awesome-icon class="icon icon-icon-envelope" icon="envelope-open"/></a>
           <a class="nav-link" v-if="token" v-on:click="goToEventsSearch()"><font-awesome-icon class="icon icon-icon-calendar" icon="calendar-alt" aria-hidden="true" title="events" alt="title"/></a>
-          <!-- <a class="nav-link">Pseudo</a> -->
           <a class="nav-link accueil-nav" v-if="token" v-on:click="goToWallMe()">
             <span class="accueil">
               <img class="nav-img" v-if="user.avatar !== undefined" :src="user.avatar"/>
@@ -47,14 +46,10 @@
 import Service from './service/serviceReal.js'
 import EventBus from './event-bus.js'
 import {globalData} from './globalData.js'
-// import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
   name: 'App',
 
-  // components: {
-  //   PulseLoader
-  // },
 
   data () {
     return {
@@ -149,7 +144,6 @@ export default {
     },
 
     goToWallMe () {
-      console.log(this.user)
       this.$router.push('/home?id=' + this.user._id)
       EventBus.$emit('goToUserWall')
     },
@@ -171,11 +165,9 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  /* margin-top: 60px; */
 }
 
 .main-container {
-  /* background: url('assets/music-background.jpg') no-repeat; */
   background: #F0F0F0;
   background-attachment: fixed;
   max-width: 100%;
@@ -189,9 +181,6 @@ export default {
   margin-left: 5px;
 }
 
-.navbar {
-  /* height: 80px; */
-}
 
 .nav-link {
   text-align: center;
@@ -238,7 +227,6 @@ export default {
   transform: scale(1.3, 1.3)
 }
 .render {
-  /* opacity: 0; */
   position: relative;
   min-height: 90vh;
   margin: 0 auto;

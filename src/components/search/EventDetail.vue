@@ -253,7 +253,6 @@ export default {
         idEvent: this.event.idEvent,
         interestedUsers: this.event.interestedUsers
       }
-      // console.log(event)
       Service.instance.unFollowEvent(event).then((event) => {
         this.event = event
         console.log(event)

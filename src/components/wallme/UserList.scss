@@ -5,12 +5,12 @@
   .container {
 
     .user-list {
-      // width: 80%;
-      // height: 100px;
-      margin-top: 50px;
 
+      margin-top: 50px;
       background: lightgrey;
+
     }
+
   }
 
   .body {
@@ -18,7 +18,9 @@
     .h-aligner {
 
       color: $orange;
+
     }
+
   }
 
   .modal-button {
@@ -31,5 +33,7 @@
       background: $orange;
       color: #fff;
     }
+
   }
+  
 }

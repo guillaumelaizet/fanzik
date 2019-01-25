@@ -2,25 +2,10 @@
 
 .container {
 
-  .bg1 {
-      background-image: url('../../assets/music-background.jpg')
-  }
-
-  .bg2 {
-      background-image: url('../../assets/music-background2.jpg')
-  }
-
-  .bg3 {
-      background-image: url('../../assets/music-background.jpg')
-  }
-
-  .bg4 {
-      background-image: url('../../assets/music-background.jpg')
-  }
-
   #image-background {
-
+    background-image: url('../../assets/music-background.jpg')
   }
+
   .landing-page-content {
 
     width: 100%;
@@ -48,15 +33,7 @@
       display: flex;
       justify-content: space-around;
 
-      .btn-link-login {
-
-      }
-
-      .btn-link-signin {
-
-      }
     }
-
 
   }
 
@@ -64,7 +41,6 @@
 
     opacity: 0.5;
     font-size: 1.1em;
-    /* padding: 5vh 0; */
     text-align: center;
     width: 100%;
     height: 150px;
@@ -89,8 +65,11 @@
         min-height: 50px;
 
       }
+
     }
+
   }
+
   .form {
 
     .form-group {
@@ -111,7 +90,9 @@
         border: 2px solid dodgerblue;
         outline: none;
         box-shadow: none;
+
       }
+
     }
 
     .btn-login {
@@ -119,35 +100,44 @@
       margin: 10px 0 10px 0;
       background: #FFA500;
       border: none;
+
     }
 
     .btn-primary {
 
       background: #FFA500;
       border: none;
+
     }
 
     .btn-success {
 
       background: red;
       border: none;
+
     }
 
   }
 
-
   .btn-success-signin {
+
     border: transparent;
     background: #FFA500;
+
   }
+
 }
 
 .btn-link-login {
+
   background: $orange;
   border: transparent;
+  
 }
 
 .btn-link-signin {
+
   background: $darkOrange;
   border: transparent;
+
 }

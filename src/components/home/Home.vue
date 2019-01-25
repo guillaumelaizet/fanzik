@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="landing-page-content bg1" id="image-background">
+    <div class="landing-page-content" id="image-background">
       <div class="large-logo">Join the new fan's music community</div>
       <div class="btn-auth">
         <div v-on:click="goToLogin($event)" class="btn btn-primary btn-lg btn-link-login">SIGNIN</div>
@@ -111,15 +111,12 @@
           <button class="v-aligned-child btn btn-primary btn-success-signin" style="vertical-align: -30px; text-align: center; color: white;">OK</button>
         </div>
       </div>
-      <!-- <div slot="footer" class="h-centred"> -->
-      <!-- </div> -->
     </popup>
 
   </div>
 </template>
 
 <script>
-// import Vue from 'vue'
 import Service from '../../service/serviceReal.js'
 import Popup from '../popup/Popup'
 import PopupAuth from '../popup/PopupAuth'

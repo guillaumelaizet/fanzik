@@ -62,12 +62,9 @@
 <script>
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import FadeLoader from 'vue-spinner/src/FadeLoader.vue'
-// import Vue from 'vue'
 import route from '../../router/index.js'
 import Service from '../../service/serviceReal.js'
 import moment from 'moment'
-// import {globalData} from '../../globalData.js'
-// import util from '../../util.js'
 
 export default {
   name: 'artist',
@@ -126,7 +123,6 @@ export default {
           this.artist.images = this.artist.images.filter((image) => {
             return image.height === 640
           })
-          // let self = this
           Service.instance.fetchRelatedArtists(token, id).then((response) => {
             this.related = response.body.artists
             document.getElementById('spinner').style.display = 'initial'

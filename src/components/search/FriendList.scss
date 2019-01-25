@@ -1,18 +1,23 @@
 @import '../../style/variables.styl';
 
-
 .wrapper {
+
   background: #fff;
+
   .nav {
 
     .nav-item {
+
       color: red;
 
       &:active {
+
         background: red !important;
-        // color: white !important;
+
       }
+
     }
+
   }
 
   .tab-content {
@@ -20,24 +25,31 @@
     #amis {
 
       .amis {
+
         display: flex;
         align-items: center;
         justify-content: center;
         margin: auto;
         flex-wrap: wrap;
+
       }
+
     }
 
     #requests {
 
       h3 {
+
         margin-top: 20px;
+
       }
       .requests {
+
         display: flex;
         align-items: center;
         justify-content: center;
         margin: auto;
+
       }
 
       .no-request {
@@ -48,18 +60,26 @@
     #suggestions {
 
       h3 {
+
         margin-top: 20px;
+
       }
-       .suggestions {
+
+      .suggestions {
+
           display: flex;
           align-items: center;
           justify-content: center;
           margin: auto;
-       }
 
-       .no-suggestion {
+      }
 
-       }
+      .no-suggestion {
+
+      }
+
     }
+
   }
+  
 }

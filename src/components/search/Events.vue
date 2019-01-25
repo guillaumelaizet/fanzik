@@ -10,7 +10,6 @@
         <div class="search-events">
           <form class="form" role="form">
             <div class="form-group">
-              <!-- <label for="">Chercher des concerts par artistes ou groupes</label> -->
               <div class="input-group">
                 <input id="search" name="search" type="text" class="form-control" placeholder="ex: paul kalkbrenner" v-model="search">
               </div>
@@ -116,12 +115,10 @@
 </template>
 
 <script>
-// import route from '../../router/index.js'
 import Service from '../../service/serviceReal.js'
 import EventDetail from './EventDetail'
 import moment from 'moment'
 import FadeLoader from 'vue-spinner/src/FadeLoader.vue'
-// import Vue from 'vue'
 
 export default {
   name: 'events',

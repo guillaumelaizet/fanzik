@@ -3,24 +3,10 @@
     <div class="modal-mask" v-on:click="close" v-show="show" transition="modal">
       <div class="modal-wrapper">
         <div class="modal-container" v-on:click.stop>
-
-          <!-- <div class="modal-header">
-            <slot name="header">
-            </slot>
-          </div> -->
-
           <div class="modal-body">
             <slot name="body">
             </slot>
           </div>
-
-          <!-- <div class="modal-footer">
-            <slot name="footer">
-              <div class="modal-button noselect" style="margin: 8px; font-size: 12pt;" v-on:click="onDefaultOkButtonPressed($event)">
-                <span class="v-aligned-child" style="vertical-align: -30px; text-align: center">{{defaultButtonTitle}}</span>
-              </div>
-            </slot>
-          </div> -->
         </div>
       </div>
     </div>
@@ -28,7 +14,6 @@
 </template>
 
 <script type="text/babel">
-// import Vue from 'vue'
 
 export default {
 

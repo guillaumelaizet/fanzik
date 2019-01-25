@@ -9,28 +9,24 @@
       <div class="form-group">
         <label class="control-label" for="">Pseudo</label>
         <div class="input-group">
-          <!-- <font-awesome-icon class="icon" icon="user"/> -->
           <input id="pseudo" name="pseudo" type="text" class="form-control rounded-0" v-model="userMe.pseudo">
         </div>
       </div>
       <div class="form-group">
         <label for="">Email</label>
         <div class="input-group">
-          <!-- <font-awesome-icon class="icon" icon="envelope-open"/> -->
           <input id="email" name="email" type="text" class="form-control rounded-0" v-model="userMe.email">
         </div>
       </div>
       <div class="form-group">
         <label class="control-label" for="">Nom</label>
         <div class="input-group">
-          <!-- <font-awesome-icon class="icon" icon="user"/> -->
           <input id="pseudo" name="pseudo" type="text" class="form-control rounded-0" v-model="userMe.nom">
         </div>
       </div>
       <div class="form-group">
         <label class="control-label" for="">Prénom</label>
         <div class="input-group">
-          <!-- <font-awesome-icon class="icon" icon="user"/> -->
           <input id="pseudo" name="pseudo" type="text" class="form-control rounded-0" v-model="userMe.prenom">
         </div>
       </div>

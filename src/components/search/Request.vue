@@ -72,7 +72,6 @@ export default {
       Service.instance.acceptFriendship(userId1, userId2).then((user) => {
         this.accepted = true
         this.user = user.userId1
-        // EventBus.$emit('acceptFriendShip', user.userId1)
 
       })
     },
